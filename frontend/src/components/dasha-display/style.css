@@ -1,0 +1,447 @@
+.dasha-display-section {
+  margin: 2rem 0;
+  padding: 0 1rem;
+}
+
+.dasha-display-section .section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.dasha-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.dasha-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 0.75rem;
+}
+
+.dasha-icon {
+  font-size: 2rem;
+}
+
+.dasha-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: white;
+}
+
+.dasha-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dasha-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dasha-info-row:last-child {
+  border-bottom: none;
+}
+
+.dasha-label {
+  font-weight: 500;
+  opacity: 0.9;
+  font-size: 0.95rem;
+}
+
+.dasha-value {
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: right;
+}
+
+.dasha-lord {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.dasha-period {
+  color: #ffd700;
+  font-size: 1.1rem;
+}
+
+.antardasha-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.antardasha-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.all-antardashas-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.antardasha-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.antardasha-clickable {
+  transition: all 0.3s ease;
+}
+
+.antardasha-clickable:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.5rem;
+  margin: -0.5rem;
+}
+
+.antardasha-item {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 0.75rem;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  position: relative;
+}
+
+.antardasha-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.antardasha-item:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.antardasha-item.active {
+  background: rgba(255, 215, 0, 0.3);
+  border-color: #ffd700;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+}
+
+.antardasha-lord {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.antardasha-period {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.antardasha-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.antardasha-date-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.antardasha-date-label {
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+.antardasha-date-value {
+  font-weight: 600;
+  opacity: 0.95;
+}
+
+.antardasha-pratyantar-hint {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  font-style: italic;
+  margin-top: 0.25rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  text-align: center;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  max-width: 90%;
+  width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  color: white;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  color: white;
+}
+
+.modal-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 2rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  line-height: 1;
+  padding: 0;
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.antardasha-info-summary {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.summary-row:last-child {
+  border-bottom: none;
+}
+
+.summary-label {
+  font-weight: 500;
+  opacity: 0.9;
+  font-size: 0.95rem;
+}
+
+.summary-value {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.pratyantar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pratyantar-item {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.pratyantar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.pratyantar-lord {
+  font-weight: 600;
+  font-size: 1.1rem;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+}
+
+.pratyantar-period {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  color: #ffd700;
+}
+
+.pratyantar-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pratyantar-date-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.pratyantar-date-label {
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+.pratyantar-date-value {
+  font-weight: 600;
+  opacity: 0.95;
+}
+
+.no-pratyantar {
+  text-align: center;
+  padding: 2rem;
+  opacity: 0.8;
+}
+
+.dasha-card-footer {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dasha-note {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin: 0;
+  font-style: italic;
+  text-align: center;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .dasha-card {
+    padding: 1rem;
+  }
+
+  .dasha-card-title {
+    font-size: 1.1rem;
+  }
+
+  .dasha-info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .dasha-value {
+    text-align: left;
+  }
+
+  .antardasha-list {
+    grid-template-columns: 1fr;
+  }
+
+  .antardasha-item {
+    gap: 0.5rem;
+  }
+
+  .antardasha-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-height: 90vh;
+  }
+
+  .modal-header {
+    padding: 1rem;
+  }
+
+  .modal-title {
+    font-size: 1.2rem;
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
+}
+

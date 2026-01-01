@@ -1,0 +1,48 @@
+/* Heat Map */
+.heatmap-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    padding: 20px;
+    margin-top: 20px;
+  }
+  
+  .heatmap-cell {
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px;
+  }
+  
+  .heatmap-cell:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+  }
+  
+  .planet-symbol-large {
+    font-size: 40px;
+    margin-bottom: 10px;
+  }
+  
+  .planet-name-small {
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .planet-score-heatmap {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+  }

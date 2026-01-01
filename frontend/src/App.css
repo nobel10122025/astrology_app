@@ -1,0 +1,352 @@
+/* CSS Variables for Theming */
+:root {
+  --theme-bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --theme-header-bg: rgba(40, 44, 52, 0.9);
+  --theme-primary: #667eea;
+  --theme-secondary: #764ba2;
+}
+
+.App {
+  min-height: 100vh;
+  background: var(--theme-bg-gradient);
+  transition: background 0.3s ease;
+}
+
+.App-header {
+  background-color: var(--theme-header-bg);
+  padding: 30px 20px;
+  color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.header-title {
+  flex: 1;
+  min-width: 250px;
+  text-align: center;
+}
+
+.theme-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 6px;
+  backdrop-filter: blur(10px);
+}
+
+.theme-selector label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: white;
+  opacity: 0.9;
+}
+
+.theme-select {
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.theme-select:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.theme-select:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.theme-select option {
+  background: #333;
+  color: white;
+}
+
+.App-header h1 {
+  margin: 0 0 10px 0;
+  font-size: 2.5rem;
+}
+
+.App-header p {
+  margin: 0;
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.error-message {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #fee;
+  border: 2px solid #fcc;
+  border-radius: 6px;
+  color: #c33;
+}
+
+.error-message p {
+  margin: 0;
+  font-weight: 500;
+}
+
+.results-container {
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 3px solid var(--theme-primary);
+  transition: border-color 0.3s ease;
+}
+
+.chart-wrapper {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.results-container h2 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  text-align: center;
+}
+
+.summary {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 25px;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 6px;
+}
+
+.summary p {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #555;
+}
+
+.high-score {
+  color: #28a745;
+  font-size: 1.1rem;
+}
+
+.medium-score {
+  color: #ffc107;
+  font-size: 1.1rem;
+}
+
+.low-score {
+  color: #dc3545;
+  font-size: 1.1rem;
+}
+
+/* Tab Toggle */
+.tab-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 10px;
+}
+
+.tab-toggle button {
+  padding: 12px 30px;
+  border: none;
+  background: transparent;
+  color: #666;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+}
+
+.tab-toggle button:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.tab-toggle button.active {
+  background: transparent;
+  color: var(--theme-primary);
+  border-bottom-color: var(--theme-primary);
+  font-weight: 600;
+  transition: color 0.3s ease, border-bottom-color 0.3s ease;
+}
+
+/* Sort Container */
+.sort-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.sort-label {
+  font-weight: 500;
+  color: #555;
+  font-size: 1rem;
+}
+
+.sort-select {
+  padding: 10px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: white;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 200px;
+}
+
+.sort-select:hover {
+  border-color: var(--theme-primary);
+  transition: border-color 0.3s ease;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: var(--theme-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-primary) 10%, transparent);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* View Toggle */
+.view-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.view-toggle button {
+  padding: 10px 20px;
+  border: 2px solid var(--theme-primary);
+  background: white;
+  color: var(--theme-primary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.view-toggle button:hover {
+  background: color-mix(in srgb, var(--theme-primary) 5%, white);
+}
+
+.view-toggle button.active {
+  background: var(--theme-bg-gradient);
+  color: white;
+  border-color: transparent;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-container {
+    margin: 20px;
+    padding: 20px;
+  }
+
+  /* Tooltip adjustments for mobile */
+  .detail-row .value .tooltip {
+    max-width: 250px;
+    min-width: 150px;
+    font-size: 12px;
+    padding: 8px 12px;
+    bottom: calc(100% + 6px);
+  }
+
+  .App-header h1 {
+    font-size: 2rem;
+  }
+
+  .summary {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .results-table {
+    font-size: 0.75rem;
+  }
+
+  .results-table th,
+  .results-table td {
+    padding: 8px 4px;
+  }
+
+  .planet-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .heatmap-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .view-toggle {
+    flex-wrap: wrap;
+  }
+
+  .view-toggle button {
+    flex: 1;
+    min-width: 80px;
+  }
+
+  .tab-toggle {
+    flex-wrap: wrap;
+  }
+
+  .tab-toggle button {
+    flex: 1;
+    min-width: 100px;
+    padding: 10px 15px;
+    font-size: 0.9rem;
+  }
+
+  .sort-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .sort-select {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .theme-selector {
+    width: 100%;
+    justify-content: center;
+  }
+}

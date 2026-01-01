@@ -1,0 +1,158 @@
+.profession-prediction-section {
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 3px solid #667eea;
+}
+
+.section-title {
+  color: #333;
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+  text-align: center;
+}
+
+.profession-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+  color: white;
+  max-width: 800px;
+  margin: 0 auto;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profession-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
+}
+
+.profession-card-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.profession-icon {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.profession-card-title {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: white;
+}
+
+.profession-card-content {
+  margin-bottom: 20px;
+}
+
+.planet-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+}
+
+.planet-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+.planet-name-profession {
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #ffd700;
+}
+
+.profession-text {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 12px;
+  border-left: 4px solid #ffd700;
+}
+
+.profession-description {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: white;
+  font-weight: 400;
+}
+
+.profession-item {
+  display: inline;
+}
+
+.profession-error {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #ffcccc;
+  font-weight: 500;
+  padding: 10px;
+  background: rgba(255, 0, 0, 0.2);
+  border-radius: 6px;
+  border-left: 3px solid #ff6666;
+}
+
+.profession-card-footer {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.profession-note {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.85;
+  font-style: italic;
+  text-align: center;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .profession-card {
+    padding: 20px;
+    margin: 0 10px;
+  }
+
+  .profession-card-title {
+    font-size: 1.4rem;
+  }
+
+  .profession-icon {
+    font-size: 36px;
+  }
+
+  .planet-indicator {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .planet-name {
+    font-size: 1rem;
+  }
+
+  .profession-description {
+    font-size: 1rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+}
+
