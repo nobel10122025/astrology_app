@@ -16,7 +16,7 @@
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  color: white;
+  color: black;
   margin-bottom: 1rem;
 }
 
@@ -37,7 +37,7 @@
   font-size: 1.25rem;
   font-weight: 600;
   margin: 0;
-  color: white;
+  color: black;
 }
 
 .dasha-card-content {
@@ -92,7 +92,7 @@
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: white;
+  color: black;
 }
 
 .all-antardashas-section {
@@ -159,7 +159,7 @@
   opacity: 0.9;
 }
 
-.antardasha-dates {
+.antardasha-dates-small {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -227,7 +227,7 @@
   width: 600px;
   max-height: 80vh;
   overflow-y: auto;
-  color: white;
+  color: black;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease;
 }
@@ -255,13 +255,13 @@
   font-size: 1.5rem;
   font-weight: 600;
   margin: 0;
-  color: white;
+  color: black;
 }
 
 .modal-close {
   background: rgba(255, 255, 255, 0.2);
   border: none;
-  color: white;
+  color: black;
   font-size: 2rem;
   width: 40px;
   height: 40px;

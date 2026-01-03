@@ -331,3 +331,174 @@ def calculate_dasha_antardasha(moon_rasi, moon_degree_in_sign, birth_date_str=No
             'all_antardashas': []
         }
 
+
+def calculate_all_dashas_120_years(moon_rasi, moon_degree_in_sign, birth_date_str):
+    """
+    Calculate all dashas for 120 years (complete Vimshottari Dasha cycle)
+    Args:
+        moon_rasi: Moon's rasi (sign)
+        moon_degree_in_sign: Moon's degree within the sign (0-30)
+        birth_date_str: Birth date as string (YYYY-MM-DD) - REQUIRED
+    Returns:
+        Dictionary with all dashas, antardashas, and pratyantardashas for 120 years
+    """
+    # Convert to absolute degree
+    moon_abs_degree = rasi_to_absolute_degree(moon_rasi, moon_degree_in_sign)
+    
+    if moon_abs_degree is None:
+        return None
+    
+    if not birth_date_str:
+        return None
+    
+    try:
+        birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d')
+        
+        # Get birth dasha information (starting dasha from Moon's nakshatra)
+        birth_dasha_info = calculate_dasha_remaining(moon_abs_degree)
+        birth_dasha_lord = birth_dasha_info['current_dasha_lord']
+        birth_nakshatra = birth_dasha_info['nakshatra']
+        
+        # Calculate elapsed portion of birth dasha at birth
+        elapsed_portion_at_birth = birth_dasha_info['elapsed_portion']
+        birth_dasha_total_days = birth_dasha_info['total_dasha_years'] * TAMIL_YEAR
+        elapsed_days_at_birth = elapsed_portion_at_birth * birth_dasha_total_days
+        remaining_days_at_birth = birth_dasha_total_days - elapsed_days_at_birth
+        
+        # Find starting dasha index
+        dasha_index = DASHA_SEQUENCE.index(birth_dasha_lord)
+        
+        # Calculate all 9 dashas (120 years total)
+        all_dashas = []
+        current_date = birth_date
+        
+        # Process all 9 dashas
+        for dasha_cycle in range(9):
+            current_dasha_lord = DASHA_SEQUENCE[(dasha_index + dasha_cycle) % 9]
+            total_dasha_years = DASHA_PERIODS[current_dasha_lord]
+            total_dasha_days = total_dasha_years * TAMIL_YEAR
+            
+            # For the first dasha, use remaining days; for others, use full period
+            if dasha_cycle == 0:
+                dasha_start_date = birth_date
+                dasha_period_days = remaining_days_at_birth
+            else:
+                dasha_start_date = current_date
+                dasha_period_days = total_dasha_days
+            
+            dasha_end_date = dasha_start_date + timedelta(days=dasha_period_days)
+            
+            # Calculate all antardashas for this dasha
+            # Start from the beginning of the dasha period
+            dasha_actual_start = dasha_start_date - timedelta(days=elapsed_days_at_birth) if dasha_cycle == 0 else dasha_start_date
+            antardashas = []
+            antardasha_start_date = dasha_actual_start
+            
+            # Find antardasha starting index (starts from current dasha lord)
+            antardasha_start_index = DASHA_SEQUENCE.index(current_dasha_lord)
+            
+            # Calculate which antardasha we're currently in (for first dasha only)
+            current_antardasha_index = 0
+            elapsed_in_current_antardasha = 0
+            if dasha_cycle == 0:
+                cumulative = 0
+                for i in range(9):
+                    ad_lord = DASHA_SEQUENCE[(antardasha_start_index + i) % 9]
+                    ad_period_days = (DASHA_PERIODS[ad_lord] / 120) * total_dasha_years * TAMIL_YEAR
+                    if cumulative <= elapsed_days_at_birth < cumulative + ad_period_days:
+                        current_antardasha_index = i
+                        elapsed_in_current_antardasha = elapsed_days_at_birth - cumulative
+                        break
+                    cumulative += ad_period_days
+            
+            for i in range(9):
+                antardasha_lord = DASHA_SEQUENCE[(antardasha_start_index + i) % 9]
+                antardasha_period_years = (DASHA_PERIODS[antardasha_lord] / 120) * total_dasha_years
+                antardasha_period_days = antardasha_period_years * TAMIL_YEAR
+                
+                # Calculate antardasha dates
+                if dasha_cycle == 0 and i == current_antardasha_index:
+                    # This is the current antardasha - start from birth date
+                    antardasha_start_date = birth_date
+                    remaining_days = antardasha_period_days - elapsed_in_current_antardasha
+                    antardasha_end_date = antardasha_start_date + timedelta(days=remaining_days)
+                else:
+                    antardasha_end_date = antardasha_start_date + timedelta(days=antardasha_period_days)
+                
+                # Calculate all pratyantardashas for this antardasha
+                pratyantardashas = []
+                pratyantar_start_date = antardasha_start_date
+                
+                # Find pratyantar starting index (starts from antardasha lord)
+                pratyantar_start_index = DASHA_SEQUENCE.index(antardasha_lord)
+                
+                # Calculate which pratyantar we're currently in (for first antardasha of first dasha only)
+                current_pratyantar_index = 0
+                elapsed_in_current_pratyantar = 0
+                if dasha_cycle == 0 and i == current_antardasha_index:
+                    cumulative = 0
+                    for j in range(9):
+                        pt_lord = DASHA_SEQUENCE[(pratyantar_start_index + j) % 9]
+                        pt_period_days = (DASHA_PERIODS[pt_lord] / 120) * antardasha_period_years * TAMIL_YEAR
+                        if cumulative <= elapsed_in_current_antardasha < cumulative + pt_period_days:
+                            current_pratyantar_index = j
+                            elapsed_in_current_pratyantar = elapsed_in_current_antardasha - cumulative
+                            break
+                        cumulative += pt_period_days
+                
+                for j in range(9):
+                    pratyantar_lord = DASHA_SEQUENCE[(pratyantar_start_index + j) % 9]
+                    pratyantar_period_years = (DASHA_PERIODS[pratyantar_lord] / 120) * antardasha_period_years
+                    pratyantar_period_days = pratyantar_period_years * TAMIL_YEAR
+                    
+                    # Calculate pratyantar dates
+                    if dasha_cycle == 0 and i == current_antardasha_index and j == current_pratyantar_index:
+                        # This is the current pratyantar - start from birth date
+                        pratyantar_start_date = birth_date
+                        remaining_days = pratyantar_period_days - elapsed_in_current_pratyantar
+                        pratyantar_end_date = pratyantar_start_date + timedelta(days=remaining_days)
+                    else:
+                        pratyantar_end_date = pratyantar_start_date + timedelta(days=pratyantar_period_days)
+                    
+                    pratyantardashas.append({
+                        'lord': pratyantar_lord,
+                        'period_years': round(pratyantar_period_years, 4),
+                        'period_days': round(pratyantar_period_days, 2),
+                        'start_date': pratyantar_start_date.strftime('%Y-%m-%d'),
+                        'end_date': pratyantar_end_date.strftime('%Y-%m-%d')
+                    })
+                    
+                    pratyantar_start_date = pratyantar_end_date
+                
+                antardashas.append({
+                    'lord': antardasha_lord,
+                    'period_years': round(antardasha_period_years, 4),
+                    'period_days': round(antardasha_period_days, 2),
+                    'start_date': antardasha_start_date.strftime('%Y-%m-%d'),
+                    'end_date': antardasha_end_date.strftime('%Y-%m-%d'),
+                    'pratyantardashas': pratyantardashas
+                })
+                
+                antardasha_start_date = antardasha_end_date
+            
+            all_dashas.append({
+                'lord': current_dasha_lord,
+                'period_years': round(total_dasha_years, 4),
+                'period_days': round(dasha_period_days, 2),
+                'start_date': dasha_start_date.strftime('%Y-%m-%d'),
+                'end_date': dasha_end_date.strftime('%Y-%m-%d'),
+                'antardashas': antardashas
+            })
+            
+            current_date = dasha_end_date
+        
+        return {
+            'birth_nakshatra': birth_nakshatra,
+            'birth_dasha_lord': birth_dasha_lord,
+            'birth_date': birth_date_str,
+            'dashas': all_dashas
+        }
+        
+    except (ValueError, TypeError) as e:
+        return None
+

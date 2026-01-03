@@ -6,6 +6,7 @@ import Form from "./components/form/index";
 import TableContent from "./components/table-content/index";
 import ProfessionPrediction from "./components/profession-prediction/index";
 import DashaDisplay from "./components/dasha-display/index";
+import AllDashasPage from "./components/all-dashas-page/index";
 
 import { SIGN_MAP, PLANET_SYMBOLS } from "./utils/constants";
 import { capitalizeFirstLetter } from "./utils/basic-logic";
@@ -55,6 +56,8 @@ function App() {
   const [activeTab, setActiveTab] = useState("planets"); // 'planets' or 'houses'
   const [sortOrder, setSortOrder] = useState("current"); // 'current', 'score-low-high', 'score-high-low'
   const [theme, setTheme] = useState("default"); // 'default', 'lightBlue', 'lightGreen'
+  const [currentPage, setCurrentPage] = useState("home"); // 'home' or 'all-dashas'
+  const [moonDataForDashas, setMoonDataForDashas] = useState(null); // Store moon data for all-dashas page
 
   // Apply theme to document root
   useEffect(() => {
@@ -318,6 +321,11 @@ function App() {
         ...(dashaData && { dasha: dashaData })
       };
       setResults(finalResults);
+      
+      // Store moon data for all-dashas page
+      if (transformedData.moon) {
+        setMoonDataForDashas(transformedData.moon);
+      }
     } catch (err) {
       setError(err.message || "An error occurred while calculating");
       console.error("Error:", err);
@@ -325,6 +333,17 @@ function App() {
       setLoading(false);
     }
   };
+
+  // If on all-dashas page, render that component
+  if (currentPage === "all-dashas") {
+    return (
+      <AllDashasPage
+        moonData={moonDataForDashas}
+        birthDate={formData.dateOfBirth}
+        onBack={() => setCurrentPage("home")}
+      />
+    );
+  }
 
   return (
     <div className="App">
@@ -519,7 +538,17 @@ function App() {
 
             {/* Dasha & Antardasha Section */}
             {results.dasha && (
-              <DashaDisplay dasha={results.dasha} />
+              <>
+                <DashaDisplay dasha={results.dasha} />
+                <div className="view-all-dashas-button-container">
+                  <button
+                    className="view-all-dashas-button"
+                    onClick={() => setCurrentPage("all-dashas")}
+                  >
+                    View all dashas
+                  </button>
+                </div>
+              </>
             )}
 
             {/* Profession Prediction Section */}

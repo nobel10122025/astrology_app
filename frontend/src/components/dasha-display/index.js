@@ -181,7 +181,7 @@ const DashaDisplay = ({ dasha }) => {
                     </span>
                   </div>
                   {antardasha.start_date && antardasha.end_date && (
-                    <div className="antardasha-dates">
+                    <div className="antardasha-dates-small">
                       <div className="antardasha-date-row">
                         <span className="antardasha-date-label">Start:</span>
                         <span className="antardasha-date-value">{antardasha.start_date}</span>

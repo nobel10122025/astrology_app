@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from calculations import calculate_subathuva_pabathuvam, calculate_house_subathuva_pabathuvam, calculate_professions, calculate_dasha_antardasha
+from calculations import calculate_subathuva_pabathuvam, calculate_house_subathuva_pabathuvam, calculate_professions, calculate_dasha_antardasha, calculate_all_dashas_120_years
 from chart_generator import generate_south_indian_chart
 from utils.constant import RASI_TO_DEGREE, PLANET_OWN_HOUSES
 
@@ -267,6 +267,58 @@ def dasha_info():
             else:
                 return jsonify({
                     'error': 'Failed to calculate dasha information',
+                    'status': 'error'
+                }), 500
+        except (ValueError, TypeError) as e:
+            return jsonify({
+                'error': f'Invalid input: {str(e)}',
+                'status': 'error'
+            }), 400
+    except Exception as e:
+        return jsonify({
+            'error': str(e),
+            'status': 'error'
+        }), 500
+
+@calculate_bp.route('/all-dashas', methods=['POST'])
+def all_dashas():
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({
+                'error': 'No data provided',
+                'status': 'error'
+            }), 400
+        
+        moon_rasi = data.get('moon', {}).get('house', '')
+        moon_degree = data.get('moon', {}).get('degree', '0')
+        birth_date = data.get('birth_date')  # Required birth date (YYYY-MM-DD format)
+        
+        if not moon_rasi or not moon_degree:
+            return jsonify({
+                'error': 'Moon rasi and degree are required',
+                'status': 'error'
+            }), 400
+        
+        if not birth_date:
+            return jsonify({
+                'error': 'Birth date is required',
+                'status': 'error'
+            }), 400
+        
+        try:
+            moon_degree_float = float(moon_degree)
+            all_dashas_info = calculate_all_dashas_120_years(moon_rasi, moon_degree_float, birth_date)
+            
+            if all_dashas_info:
+                return jsonify({
+                    'status': 'success',
+                    'data': all_dashas_info
+                }), 200
+            else:
+                return jsonify({
+                    'error': 'Failed to calculate all dashas',
                     'status': 'error'
                 }), 500
         except (ValueError, TypeError) as e:

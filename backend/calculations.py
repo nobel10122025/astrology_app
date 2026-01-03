@@ -34,7 +34,8 @@ from utils.calculations.dasha_calculation import (
     get_nakshatra_from_degree,
     calculate_dasha_remaining,
     calculate_antardashas,
-    calculate_dasha_antardasha
+    calculate_dasha_antardasha,
+    calculate_all_dashas_120_years
 )
 
 # Re-export all functions for backward compatibility
@@ -62,4 +63,5 @@ __all__ = [
     'calculate_dasha_remaining',
     'calculate_antardashas',
     'calculate_dasha_antardasha',
+    'calculate_all_dashas_120_years',
 ]
