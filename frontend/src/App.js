@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setProfile } from "./store/user/actions";
 
 import HeatMap from "./components/heat-map/index";
 import CardContent from "./components/card-content/index";
@@ -10,35 +12,14 @@ import AllDashasPage from "./components/all-dashas-page/index";
 
 import { SIGN_MAP, PLANET_SYMBOLS } from "./utils/constants";
 import { capitalizeFirstLetter } from "./utils/basic-logic";
-import "./App.css";
+import { themes } from "./utils/theme-constants";
 
-// Theme definitions
-const themes = {
-  default: {
-    name: "Default",
-    bgGradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-    headerBg: "rgba(40, 44, 52, 0.9)",
-    primaryColor: "#667eea",
-    secondaryColor: "#764ba2",
-  },
-  lightBlue: {
-    name: "Light Blue",
-    bgGradient: "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)",
-    headerBg: "rgba(33, 150, 243, 0.9)",
-    primaryColor: "#2196f3",
-    secondaryColor: "#64b5f6",
-  },
-  lightGreen: {
-    name: "Light Green",
-    bgGradient: "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)",
-    headerBg: "rgba(76, 175, 80, 0.9)",
-    primaryColor: "#4caf50",
-    secondaryColor: "#81c784",
-  },
-};
+import "./App.css";
 
 function App() {
   // Initialize form state
+  const dispatch = useDispatch();
+  const profile = useSelector((state) => state.user.profile);
   const [formData, setFormData] = useState({
     name: "",
     dateOfBirth: "",
@@ -203,6 +184,13 @@ function App() {
       // Calculate timezone offset (default to IST: +5:30)
       const timezoneOffset = new Date().getTimezoneOffset();
       const timezone = -(timezoneOffset / 60); // Convert to hours
+      dispatch(setProfile({
+        name: formData.name,
+        dateOfBirth: formData.dateOfBirth,
+        timeOfBirth: formData.timeOfBirth,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
+      }));
 
       // Prepare request payload for astrology API
       const astrologyPayload = {

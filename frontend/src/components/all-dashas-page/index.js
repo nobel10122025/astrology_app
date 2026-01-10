@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { DateForm } from "../date-form/index";
+
 import "./style.css";
 
 const AllDashasPage = ({ moonData, birthDate, onBack }) => {
@@ -67,13 +69,15 @@ const AllDashasPage = ({ moonData, birthDate, onBack }) => {
       const months = Math.floor(years * 12);
       const days = Math.floor((years * 365.25) % 30);
       if (months > 0) {
-        return `${months} month${months > 1 ? "s" : ""} ${days} day${days !== 1 ? "s" : ""}`;
+        return `${months} month${months > 1 ? "s" : ""} ${days} day${
+          days !== 1 ? "s" : ""
+        }`;
       }
       return `${days} day${days !== 1 ? "s" : ""}`;
     }
     const wholeYears = Math.floor(years);
     const months = Math.floor((years - wholeYears) * 12);
-    
+
     let result = `${wholeYears} year${wholeYears !== 1 ? "s" : ""}`;
     if (months > 0) {
       result += ` ${months} month${months > 1 ? "s" : ""}`;
@@ -149,7 +153,7 @@ const AllDashasPage = ({ moonData, birthDate, onBack }) => {
           </p>
         </div>
       </div>
-
+      <DateForm allDashasData={allDashasData} />
       <div className="dashas-container">
         {allDashasData.dashas && allDashasData.dashas.length > 0 ? (
           allDashasData.dashas.map((dasha, dashaIndex) => (
@@ -187,10 +191,7 @@ const AllDashasPage = ({ moonData, birthDate, onBack }) => {
                     dasha.antardashas.map((antardasha, antardashaIndex) => {
                       const antardashaKey = `${dashaIndex}-${antardashaIndex}`;
                       return (
-                        <div
-                          key={antardashaIndex}
-                          className="antardasha-item"
-                        >
+                        <div key={antardashaIndex} className="antardasha-item">
                           <div
                             className="antardasha-header"
                             onClick={() =>
@@ -254,7 +255,9 @@ const AllDashasPage = ({ moonData, birthDate, onBack }) => {
                                         </span>
                                       </div>
                                       <div className="pratyantar-dates">
-                                        <span className="date-label">Start:</span>
+                                        <span className="date-label">
+                                          Start:
+                                        </span>
                                         <span className="date-value">
                                           {pratyantar.start_date}
                                         </span>
@@ -292,4 +295,3 @@ const AllDashasPage = ({ moonData, birthDate, onBack }) => {
 };
 
 export default AllDashasPage;
-
