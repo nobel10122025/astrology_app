@@ -79,7 +79,7 @@
 }
 
 .submit-button {
-    background: var(--theme-bg-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+    background: var(--theme-secondary);
     color: white;
     padding: 15px 40px;
     border: none;
@@ -94,7 +94,7 @@
 
 .submit-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px color-mix(in srgb, var(--theme-primary, #667eea) 40%, transparent);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--theme-secondary) 40%, transparent);
 }
 
 .submit-button:active {

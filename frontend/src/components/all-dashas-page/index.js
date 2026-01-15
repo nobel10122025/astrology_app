@@ -254,7 +254,7 @@ const AllDashasPage = ({ moonData, birthDate, onBack }) => {
                                           {formatYears(pratyantar.period_years)}
                                         </span>
                                       </div>
-                                      <div className="pratyantar-dates">
+                                      <div className="pratyantar-dates-row">
                                         <span className="date-label">
                                           Start:
                                         </span>

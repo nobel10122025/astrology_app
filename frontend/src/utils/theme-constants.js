@@ -15,9 +15,23 @@ export const themes = {
   },
   lightGreen: {
     name: "Light Green",
-    bgGradient: "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)",
+    bgGradient: "linear-gradient(135deg, #f0faf4 0%, #cdebd8 55%, #9fd3b8 100%)",
     headerBg: "rgba(76, 175, 80, 0.9)",
     primaryColor: "#4caf50",
     secondaryColor: "#81c784",
   },
+  lightRed: {
+    name: "Light Red",
+    bgGradient: "linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%)",
+    headerBg: "rgba(255, 99, 71, 0.9)",
+    primaryColor: "#f44336",
+    secondaryColor: "#ef5350",
+  },
+  yellow: {
+    name: "Yellow",
+    bgGradient: "linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%)",
+    headerBg: "rgba(255, 215, 0, 0.9)",
+    primaryColor: "#ffd700",
+    secondaryColor: "#ffe680",
+  }
 };
