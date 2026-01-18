@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { DateForm } from "../date-form/index";
 import { API_BASE_URL } from "../../utils/constants/api-constant";
 import "./style.css";
 
 const AllDashasPage = ({ moonData, birthDate, onBack }) => {
+  const isApiCall = useRef(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [allDashasData, setAllDashasData] = useState(null);
@@ -23,15 +24,10 @@ const AllDashasPage = ({ moonData, birthDate, onBack }) => {
     mercury: "Mercury",
   };
 
-  useEffect(() => {
-    if (moonData && birthDate) {
-      fetchAllDashas();
-    }
-  }, [moonData, birthDate]);
-
-  const fetchAllDashas = async () => {
+    const fetchAllDashas = useCallback(async () => {
     setLoading(true);
     setError(null);
+    isApiCall.current = true;
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/all-dashas`, {
@@ -62,7 +58,13 @@ const AllDashasPage = ({ moonData, birthDate, onBack }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [moonData, birthDate]);
+
+  useEffect(() => {
+    if (moonData && birthDate && !isApiCall.current) {
+      fetchAllDashas();
+    }
+  }, [moonData, birthDate, fetchAllDashas]);
 
   const formatYears = (years) => {
     if (years < 1) {
