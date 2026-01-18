@@ -184,31 +184,37 @@ def calculate():
         profession_data = calculate_professions(data, results, positions, house_results)
         
         # Generate profession prediction using AI
+        # profession_json = {
+        #     "planets": [],
+        #     "professions": []
+        # }
+        # if profession_data:
+        #     try:
+        #         # Import here to avoid circular dependency
+        #         from blueprints.ai import generate_profession_prediction
+        #         profession_result = generate_profession_prediction(profession_data)
+        #         # Ensure it's a dict (the function should return a dict)
+        #         if isinstance(profession_result, dict):
+        #             profession_json = profession_result
+        #         else:
+        #             # Fallback if it's not a dict
+        #             profession_json = {
+        #                 "planets": [],
+        #                 "professions": [],
+        #                 "error": "Invalid response format"
+        #             }
+        #     except Exception as e:
+        #         profession_json = {
+        #             "planets": [],
+        #             "professions": [],
+        #             "error": str(e)
+        #         }
+        
+        # Default empty profession data when prediction is commented out
         profession_json = {
             "planets": [],
             "professions": []
         }
-        if profession_data:
-            try:
-                # Import here to avoid circular dependency
-                from blueprints.ai import generate_profession_prediction
-                profession_result = generate_profession_prediction(profession_data)
-                # Ensure it's a dict (the function should return a dict)
-                if isinstance(profession_result, dict):
-                    profession_json = profession_result
-                else:
-                    # Fallback if it's not a dict
-                    profession_json = {
-                        "planets": [],
-                        "professions": [],
-                        "error": "Invalid response format"
-                    }
-            except Exception as e:
-                profession_json = {
-                    "planets": [],
-                    "professions": [],
-                    "error": str(e)
-                }
         
         response_data = {
             'status': 'success',
