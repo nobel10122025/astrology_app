@@ -12,7 +12,7 @@ ai_bp = Blueprint('ai', __name__)
 chat = ChatPerplexity(
     model="sonar-pro",
     temperature=0.7,
-    pplx_api_key=os.getenv('PPLX_API_KEY')
+    pplx_api_key=os.environ.get('PPLX_API_KEY')
 )
 
 prompt = ChatPromptTemplate.from_messages([
@@ -84,7 +84,7 @@ Example:
 
 IMPORTANT: Return ONLY the JSON object, no markdown code blocks, no explanations, just the JSON.
 """
-    
+    print("prompt_text", prompt_text)
     try:
         response = chain.invoke({"question": prompt_text})
         content = response.content.strip()
