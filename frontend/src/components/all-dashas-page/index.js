@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { DateForm } from "../date-form/index";
-
+import { API_BASE_URL } from "../../utils/constants/api-constant";
 import "./style.css";
 
 const AllDashasPage = ({ moonData, birthDate, onBack }) => {
@@ -34,7 +34,7 @@ const AllDashasPage = ({ moonData, birthDate, onBack }) => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:5001/api/all-dashas", {
+      const response = await fetch(`${API_BASE_URL}/api/all-dashas`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setProfile } from "./store/user/actions";
 
 import HeatMap from "./components/heat-map/index";
@@ -13,13 +13,14 @@ import AllDashasPage from "./components/all-dashas-page/index";
 import { SIGN_MAP, PLANET_SYMBOLS } from "./utils/constants";
 import { capitalizeFirstLetter } from "./utils/basic-logic";
 import { themes } from "./utils/theme-constants";
+import { API_BASE_URL } from "./utils/constants/api-constant";
 
 import "./App.css";
 
 function App() {
   // Initialize form state
   const dispatch = useDispatch();
-  const profile = useSelector((state) => state.user.profile);
+  // const profile = useSelector((state) => state.user.profile);
   const [formData, setFormData] = useState({
     name: "",
     dateOfBirth: "",
@@ -257,7 +258,7 @@ function App() {
       // Call backend with transformed data (without birth_date for main calculation)
       const calculatePayload = { ...transformedData };
       const backendResponse = await fetch(
-        "http://localhost:5001/api/calculate",
+        `${API_BASE_URL}/api/calculate`,
         {
           method: "POST",
           headers: {
@@ -281,7 +282,7 @@ function App() {
             birth_date: formData.dateOfBirth
           };
           const dashaResponse = await fetch(
-            "http://localhost:5001/api/dasha-info",
+            `${API_BASE_URL}/api/dasha-info`,
             {
               method: "POST",
               headers: {
