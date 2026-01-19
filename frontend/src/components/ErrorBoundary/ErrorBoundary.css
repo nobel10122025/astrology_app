@@ -1,0 +1,92 @@
+.error-boundary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  min-height: 50vh;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  color: white;
+  border-radius: 12px;
+  margin: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.error-boundary h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.error-boundary p {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+  max-width: 500px;
+}
+
+.reload-button {
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 6px;
+  background: white;
+  color: #ee5a24;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.reload-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.error-details {
+  margin-top: 2rem;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  border-radius: 6px;
+  max-width: 600px;
+  width: 100%;
+}
+
+.error-details summary {
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.error-details pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  text-align: left;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .error-boundary {
+    margin: 1rem;
+    padding: 2rem 1rem;
+  }
+
+  .error-boundary h2 {
+    font-size: 1.5rem;
+  }
+
+  .error-boundary p {
+    font-size: 1rem;
+  }
+
+  .reload-button {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
