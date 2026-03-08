@@ -177,6 +177,32 @@ const ResultsDisplay = ({
         </div>
       )}
 
+      {results.relationship && (
+        <div className="dasha-section">
+          <div className="view-all-dashas-button-container">
+            <button
+              className="view-all-dashas-button"
+              onClick={() => setCurrentPage("relationship")}
+            >
+              View Relationship Analysis
+            </button>
+          </div>
+        </div>
+      )}
+
+      {results.marriage && (
+        <div className="dasha-section">
+          <div className="view-all-dashas-button-container">
+            <button
+              className="view-all-dashas-button"
+              onClick={() => setCurrentPage("marriage")}
+            >
+              View Marriage Analysis
+            </button>
+          </div>
+        </div>
+      )}
+
       {results.prediction && results.prediction.profession && (
         <ProfessionPrediction
           profession={results.prediction.profession}

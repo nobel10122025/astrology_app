@@ -216,6 +216,113 @@ def calculate():
             "professions": []
         }
         
+        # Helper functions for relationship and marriage data
+        def get_house(num):
+            return next((h for h in house_table_data if h['house'] == num), None)
+
+        def get_house_lord(num):
+            rasi = house_rasi_map.get(num, '')
+            lord = None
+            for planet, owned_rasi_list in PLANET_OWN_HOUSES.items():
+                if rasi in owned_rasi_list:
+                    lord = planet
+                    break
+            score = next((p for p in table_data if p['planet'].lower() == lord), None) if lord else None
+            return {'planet': lord, 'score': score}
+
+        def get_planet(name):
+            return next((p for p in table_data if p['planet'] == name.upper()), None)
+
+        def get_rasi_house(rasi):
+            return next((h for h in house_table_data if h['rasi'] == rasi), None)
+
+        # Build marriage data
+        rasi_list = list(RASI_TO_DEGREE.keys())
+        moon_rasi = positions.get('moon', {}).get('rasi', '')
+
+        def get_house_by_rasi(rasi):
+            return next((h for h in house_table_data if h['rasi'] == rasi), None)
+
+        def rasi_offset(base_rasi, offset):
+            if not base_rasi or base_rasi not in rasi_list:
+                return None
+            return rasi_list[(rasi_list.index(base_rasi) + offset) % 12]
+
+        marriage = {
+            'from_lagna': {
+                'second_house': get_house(2),
+                'seventh_house': get_house(7),
+                'eighth_house': get_house(8)
+            },
+            'from_moon': {
+                'second_house': get_house_by_rasi(rasi_offset(moon_rasi, 1)),
+                'seventh_house': get_house_by_rasi(rasi_offset(moon_rasi, 6)),
+                'eighth_house': get_house_by_rasi(rasi_offset(moon_rasi, 7))
+            },
+            'key_indicators': {
+                'seventh_house': get_house(7),
+                'seventh_house_lord': get_house_lord(7),
+                'venus': get_planet('venus')
+            }
+        }
+
+        relationship = {
+            'father': {
+                'ninth_house': get_house(9),
+                'ninth_house_lord': get_house_lord(9),
+                'sun': get_planet('sun'),
+                'simha_house': get_rasi_house('simha')
+            },
+            'mother': {
+                'fourth_house': get_house(4),
+                'fourth_house_lord': get_house_lord(4),
+                'moon': get_planet('moon'),
+                'kadagam_house': get_rasi_house('karka')
+            },
+            'younger_brother': {
+                'third_house': get_house(3),
+                'third_house_lord': get_house_lord(3),
+                'mars': get_planet('mars'),
+                'mesha_house': get_rasi_house('mesha'),
+                'vrishchika_house': get_rasi_house('vrishchika')
+            },
+            'spouse': {
+                'seventh_house': get_house(7),
+                'seventh_house_lord': get_house_lord(7),
+                'venus': get_planet('venus'),
+                'vrishabha_house': get_rasi_house('vrishabha'),
+                'thulam_house': get_rasi_house('tula')
+            },
+            'children': {
+                'fifth_house': get_house(5),
+                'fifth_house_lord': get_house_lord(5),
+                'jupiter': get_planet('jupiter'),
+                'meena_house': get_rasi_house('meena'),
+                'dhanu_house': get_rasi_house('dhanu')
+            },
+            'elder_brother': {
+                'eleventh_house': get_house(11),
+                'eleventh_house_lord': get_house_lord(11),
+                'mars': get_planet('mars'),
+                'mesha_house': get_rasi_house('mesha'),
+                'vrishchika_house': get_rasi_house('vrishchika')
+            },
+            'elder_sister': {
+                'eleventh_house': get_house(11),
+                'eleventh_house_lord': get_house_lord(11),
+                'venus': get_planet('venus'),
+                'vrishabha_house': get_rasi_house('vrishabha'),
+                'thulam_house': get_rasi_house('tula')
+            },
+            'younger_sister': {
+                'third_house': get_house(3),
+                'third_house_lord': get_house_lord(3),
+                'venus': get_planet('venus'),
+                'vrishabha_house': get_rasi_house('vrishabha'),
+                'thulam_house': get_rasi_house('tula')
+            }
+        }
+
         response_data = {
             'status': 'success',
             'results': table_data,
@@ -224,6 +331,8 @@ def calculate():
             'prediction': {
                 'profession': profession_json
             },
+            'relationship': relationship,
+            'marriage': marriage,
             'summary': {
                 'total_planets': len(table_data),
                 'average_score': round(sum(r['final_score'] for r in table_data) / len(table_data), 2) if table_data else 0,

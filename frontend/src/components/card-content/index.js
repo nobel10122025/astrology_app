@@ -22,7 +22,14 @@ const CardContent = ({ results, expandItem, toggle, is_planet_card }) => {
         const subathuvaValue = getValue(item.subathuva);
         const pabathuvamValue = getValue(item.pabathuvam);
         const hasBothEffects = subathuvaValue !== 0 && pabathuvamValue !== 0;
+        const hasOnlySubathuva = subathuvaValue !== 0 && pabathuvamValue === 0;
+        const hasOnlyPabathuvam = subathuvaValue === 0 && pabathuvamValue !== 0;
         const hasNoEffects = subathuvaValue === 0 && pabathuvamValue === 0;
+        const emoji = hasBothEffects ? "❤️" : hasOnlySubathuva ? "💚" : hasOnlyPabathuvam ? "🖤" : "💛";
+        const emojiTitle = hasBothEffects ? "Has both Subathuva and Pabathuvam effects"
+          : hasOnlySubathuva ? "Has only Subathuva effects"
+          : hasOnlyPabathuvam ? "Has only Pabathuvam effects"
+          : "Has no Subathuva or Pabathuvam effects";
 
         return (
           <div
@@ -40,22 +47,9 @@ const CardContent = ({ results, expandItem, toggle, is_planet_card }) => {
                   {is_planet_card ? "Planet" : "House"}{" "}
                   {is_planet_card ? item.planet : item.house}
                 </span>
-                {hasBothEffects && (
-                  <span
-                    className="dual-effect-icon"
-                    title="Has both Subathuva and Pabathuvam effects"
-                  >
-                    ❤️
-                  </span>
-                )}
-                {hasNoEffects && (
-                  <span
-                    className="dual-effect-icon"
-                    title="Has no Subathuva or Pabathuvam effects"
-                  >
-                    💚
-                  </span>
-                )}
+                <span className="dual-effect-icon" title={emojiTitle}>
+                  {emoji}
+                </span>
               </div>
               <div
                 className="score-badge"

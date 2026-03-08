@@ -1,0 +1,189 @@
+.relationship-page {
+  min-height: 100vh;
+  padding: 20px;
+  background: var(--theme-bg-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+}
+
+.relationship-header {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.back-button {
+  background: var(--theme-primary, #667eea);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 15px;
+  transition: background 0.3s;
+}
+
+.back-button:hover {
+  background: var(--theme-secondary, #764ba2);
+}
+
+.page-title {
+  color: #333;
+  margin: 10px 0 0;
+  font-size: 28px;
+}
+
+.relationship-cards-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.relationship-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.relationship-card-title {
+  background: var(--theme-primary, #667eea);
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 14px 20px;
+  letter-spacing: 0.5px;
+}
+
+.relationship-card-body {
+  padding: 10px 0;
+}
+
+.relationship-score-item-wrapper {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.relationship-score-item-wrapper:last-child {
+  border-bottom: none;
+}
+
+.relationship-score-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+}
+
+.relationship-score-item.clickable {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.relationship-score-item.clickable:hover {
+  background: #f5f5f5;
+}
+
+.relationship-score-label {
+  width: 140px;
+  font-weight: 600;
+  color: #555;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.relationship-score-name {
+  flex: 1;
+  color: #333;
+  font-size: 14px;
+}
+
+.relationship-score-na {
+  flex: 1;
+  color: #aaa;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.relationship-score-badge {
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  min-width: 40px;
+  text-align: center;
+}
+
+.relationship-emoji-slot {
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.relationship-expand-icon {
+  font-size: 11px;
+  color: #aaa;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.relationship-breakdown {
+  background: #f8f9fa;
+  border-left: 3px solid var(--theme-primary, #667eea);
+  margin: 0 20px 12px 20px;
+  border-radius: 0 6px 6px 0;
+  padding: 12px 16px;
+}
+
+.breakdown-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #555;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.breakdown-planets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.breakdown-planets-label {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.planet-tag {
+  background: var(--theme-primary, #667eea);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .relationship-page {
+    padding: 10px;
+  }
+
+  .relationship-cards-container {
+    grid-template-columns: 1fr;
+  }
+
+  .relationship-score-item {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .relationship-score-label {
+    width: 100%;
+  }
+}

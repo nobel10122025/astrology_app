@@ -4,6 +4,8 @@ import Header from "./components/Header/index";
 import Form from "./components/form/index";
 import ResultsDisplay from "./components/ResultsDisplay/index";
 import AllDashasPage from "./components/all-dashas-page/index";
+import RelationshipPage from "./components/relationship-page/index";
+import MarriagePage from "./components/marriage-page/index";
 import { useAstrologyForm } from "./hooks/useAstrologyForm";
 import { useTheme } from "./hooks/useTheme";
 import { useViewControls } from "./hooks/useViewControls";
@@ -41,6 +43,24 @@ function App() {
       <AllDashasPage
         moonData={moonDataForDashas}
         birthDate={formData.dateOfBirth}
+        onBack={() => setCurrentPage("home")}
+      />
+    );
+  }
+
+  if (currentPage === "relationship") {
+    return (
+      <RelationshipPage
+        relationship={results?.relationship}
+        onBack={() => setCurrentPage("home")}
+      />
+    );
+  }
+
+  if (currentPage === "marriage") {
+    return (
+      <MarriagePage
+        marriage={results?.marriage}
         onBack={() => setCurrentPage("home")}
       />
     );
