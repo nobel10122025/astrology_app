@@ -24,7 +24,6 @@ const CardContent = ({ results, expandItem, toggle, is_planet_card }) => {
         const hasBothEffects = subathuvaValue !== 0 && pabathuvamValue !== 0;
         const hasOnlySubathuva = subathuvaValue !== 0 && pabathuvamValue === 0;
         const hasOnlyPabathuvam = subathuvaValue === 0 && pabathuvamValue !== 0;
-        const hasNoEffects = subathuvaValue === 0 && pabathuvamValue === 0;
         const emoji = hasBothEffects ? "❤️" : hasOnlySubathuva ? "💚" : hasOnlyPabathuvam ? "🖤" : "💛";
         const emojiTitle = hasBothEffects ? "Has both Subathuva and Pabathuvam effects"
           : hasOnlySubathuva ? "Has only Subathuva effects"
