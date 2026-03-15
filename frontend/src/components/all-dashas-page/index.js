@@ -3,7 +3,7 @@ import { DateForm } from "../date-form/index";
 import { API_BASE_URL } from "../../utils/constants/api-constant";
 import "./style.css";
 
-const AllDashasPage = ({ moonData, birthDate, onBack }) => {
+const AllDashasPage = ({ moonData, birthDate, chartData, onBack }) => {
   const isApiCall = useRef(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -38,6 +38,7 @@ const AllDashasPage = ({ moonData, birthDate, onBack }) => {
         body: JSON.stringify({
           moon: moonData,
           birth_date: birthDate,
+          chart_data: chartData,
         }),
       });
 
@@ -58,13 +59,21 @@ const AllDashasPage = ({ moonData, birthDate, onBack }) => {
     } finally {
       setLoading(false);
     }
-  }, [moonData, birthDate]);
+  }, [moonData, birthDate, chartData]);
 
   useEffect(() => {
     if (moonData && birthDate && !isApiCall.current) {
       fetchAllDashas();
     }
   }, [moonData, birthDate, fetchAllDashas]);
+
+  const formatAge = (age) => {
+    if (age === null || age === undefined) return null;
+    const whole = Math.floor(age);
+    const months = Math.round((age - whole) * 12);
+    if (months === 0) return `${whole} yrs`;
+    return `${whole} yrs ${months} mo`;
+  };
 
   const formatYears = (years) => {
     if (years < 1) {
@@ -85,6 +94,38 @@ const AllDashasPage = ({ moonData, birthDate, onBack }) => {
       result += ` ${months} month${months > 1 ? "s" : ""}`;
     }
     return result;
+  };
+
+  const ordinal = (n) => {
+    const s = ['th', 'st', 'nd', 'rd'];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  };
+
+  const PlanetInfo = ({ info }) => {
+    if (!info) return null;
+    return (
+      <div className="planet-info-block">
+        {info.owned_houses && info.owned_houses.length > 0 && (
+          <div className="planet-info-row">
+            <span className="planet-info-label">Owns:</span>
+            <span className="planet-info-value">{info.owned_houses.map(h => ordinal(h)).join(', ')}</span>
+          </div>
+        )}
+        {info.placed_in_house && (
+          <div className="planet-info-row">
+            <span className="planet-info-label">Placed in:</span>
+            <span className="planet-info-value">{ordinal(info.placed_in_house)} house</span>
+          </div>
+        )}
+        {info.aspects_houses && info.aspects_houses.length > 0 && (
+          <div className="planet-info-row">
+            <span className="planet-info-label">Aspects:</span>
+            <span className="planet-info-value">{info.aspects_houses.map(h => ordinal(h)).join(', ')}</span>
+          </div>
+        )}
+      </div>
+    );
   };
 
   const toggleDasha = (index) => {
@@ -184,7 +225,14 @@ const AllDashasPage = ({ moonData, birthDate, onBack }) => {
                 <span className="date-value">{dasha.start_date}</span>
                 <span className="date-label">End:</span>
                 <span className="date-value">{dasha.end_date}</span>
+                {dasha.age_at_start !== undefined && dasha.age_at_end !== undefined && (
+                  <>
+                    <span className="date-label">Age:</span>
+                    <span className="date-value">{formatAge(dasha.age_at_start)} – {formatAge(dasha.age_at_end)}</span>
+                  </>
+                )}
               </div>
+              <PlanetInfo info={dasha.planet_info} />
 
               {expandedDasha === dashaIndex && (
                 <div className="antardashas-container">
@@ -229,7 +277,14 @@ const AllDashasPage = ({ moonData, birthDate, onBack }) => {
                             <span className="date-value">
                               {antardasha.end_date}
                             </span>
+                            {antardasha.age_at_start !== undefined && antardasha.age_at_end !== undefined && (
+                              <>
+                                <span className="date-label">Age:</span>
+                                <span className="date-value">{formatAge(antardasha.age_at_start)} – {formatAge(antardasha.age_at_end)}</span>
+                              </>
+                            )}
                           </div>
+                          <PlanetInfo info={antardasha.planet_info} />
 
                           {expandedAntardasha === antardashaKey && (
                             <div className="pratyantardashas-container">
@@ -267,7 +322,14 @@ const AllDashasPage = ({ moonData, birthDate, onBack }) => {
                                         <span className="date-value">
                                           {pratyantar.end_date}
                                         </span>
+                                        {pratyantar.age_at_start !== undefined && pratyantar.age_at_end !== undefined && (
+                                          <>
+                                            <span className="date-label">Age:</span>
+                                            <span className="date-value">{formatAge(pratyantar.age_at_start)} – {formatAge(pratyantar.age_at_end)}</span>
+                                          </>
+                                        )}
                                       </div>
+                                      <PlanetInfo info={pratyantar.planet_info} />
                                     </div>
                                   )
                                 )

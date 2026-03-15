@@ -2,9 +2,69 @@
 Dasha and Antardasha calculation functions
 """
 
-from utils.constant import NAKSHATRAS, DASHA_PERIODS, DASHA_SEQUENCE, TAMIL_YEAR
+from utils.constant import NAKSHATRAS, DASHA_PERIODS, DASHA_SEQUENCE, TAMIL_YEAR, PLANET_OWN_HOUSES, RASI_TO_DEGREE
 from utils.calculations.utils import rasi_to_absolute_degree, normalize_degree
 from datetime import datetime, timedelta
+
+
+ASPECT_OFFSETS = {
+    'sun':     [6],
+    'moon':    [6],
+    'mercury': [6],
+    'venus':   [6],
+    'mars':    [3, 6, 7],   # 4th, 7th, 8th
+    'jupiter': [4, 6, 8],   # 5th, 7th, 9th
+    'saturn':  [2, 6, 9],   # 3rd, 7th, 10th
+    'rahu':    [6],
+    'ketu':    [6],
+}
+
+
+def get_planet_chart_info(planet_name, chart_data):
+    """
+    Return owned houses, placement house, and aspected houses for a planet.
+    Args:
+        planet_name: e.g. 'jupiter'
+        chart_data: dict with 'ascendant' and planet entries, each having a 'house' (rasi) key
+    """
+    if not chart_data:
+        return None
+
+    ascendant_rasi = chart_data.get('ascendant', {}).get('house', '')
+    if not ascendant_rasi:
+        return None
+
+    rasi_list = list(RASI_TO_DEGREE.keys())
+    if ascendant_rasi not in rasi_list:
+        return None
+
+    asc_index = rasi_list.index(ascendant_rasi)
+
+    # 1. Owned houses
+    owned_houses = []
+    for rasi in PLANET_OWN_HOUSES.get(planet_name, []):
+        if rasi in rasi_list:
+            house_num = (rasi_list.index(rasi) - asc_index) % 12 + 1
+            owned_houses.append(house_num)
+
+    # 2. Placed in house
+    planet_rasi = chart_data.get(planet_name, {}).get('house', '')
+    placed_in_house = None
+    if planet_rasi and planet_rasi in rasi_list:
+        placed_in_house = (rasi_list.index(planet_rasi) - asc_index) % 12 + 1
+
+    # 3. Aspected houses
+    aspects_houses = []
+    if placed_in_house:
+        for offset in ASPECT_OFFSETS.get(planet_name, [6]):
+            aspected_house = (placed_in_house - 1 + offset) % 12 + 1
+            aspects_houses.append(aspected_house)
+
+    return {
+        'owned_houses': sorted(owned_houses),
+        'placed_in_house': placed_in_house,
+        'aspects_houses': sorted(aspects_houses),
+    }
 
 
 def get_nakshatra_from_degree(degree):
@@ -131,13 +191,14 @@ def calculate_pratyantardashas(antardasha_lord, antardasha_period_years):
     return pratyantardashas
 
 
-def calculate_dasha_antardasha(moon_rasi, moon_degree_in_sign, birth_date_str=None):
+def calculate_dasha_antardasha(moon_rasi, moon_degree_in_sign, birth_date_str=None, chart_data=None):
     """
     Main function to calculate current dasha and antardasha based on age and progression
     Args:
         moon_rasi: Moon's rasi (sign)
         moon_degree_in_sign: Moon's degree within the sign (0-30)
         birth_date_str: Birth date as string (YYYY-MM-DD) - REQUIRED for current dasha calculation
+        chart_data: Full chart data with ascendant and planet positions (optional)
     Returns:
         Dictionary with current dasha and antardasha information
     """
@@ -168,7 +229,8 @@ def calculate_dasha_antardasha(moon_rasi, moon_degree_in_sign, birth_date_str=No
                 'remaining_days': round(birth_dasha_info['remaining_days'], 2),
                 'end_date': None,
                 'total_period_years': birth_dasha_info['total_dasha_years'],
-                'is_birth_dasha': True
+                'is_birth_dasha': True,
+                'planet_info': get_planet_chart_info(birth_dasha_lord, chart_data)
             },
             'current_antardasha': None,
             'all_antardashas': []
@@ -217,6 +279,11 @@ def calculate_dasha_antardasha(moon_rasi, moon_degree_in_sign, birth_date_str=No
         days_elapsed_in_current_dasha = current_dasha_elapsed_years * TAMIL_YEAR
         current_dasha_start_date = current_date - timedelta(days=days_elapsed_in_current_dasha)
         current_dasha_end_date = current_dasha_start_date + timedelta(days=current_dasha_total_years * TAMIL_YEAR)
+
+        # Current age
+        current_age = round(total_days_since_birth / TAMIL_YEAR, 2)
+        dasha_age_at_start = round((current_dasha_start_date - birth_date).days / TAMIL_YEAR, 2)
+        dasha_age_at_end = round((current_dasha_end_date - birth_date).days / TAMIL_YEAR, 2)
         
         # Calculate antardashas for current dasha
         antardashas = calculate_antardashas(current_dasha_lord, current_dasha_remaining_years)
@@ -236,9 +303,13 @@ def calculate_dasha_antardasha(moon_rasi, moon_degree_in_sign, birth_date_str=No
         # Calculate antardasha start and end dates
         antardasha_start_date = None
         antardasha_end_date = None
+        antardasha_age_at_start = None
+        antardasha_age_at_end = None
         if current_antardasha:
             antardasha_start_date = current_dasha_start_date + timedelta(days=current_antardasha['start_day'])
             antardasha_end_date = current_dasha_start_date + timedelta(days=current_antardasha['end_day'])
+            antardasha_age_at_start = round((antardasha_start_date - birth_date).days / TAMIL_YEAR, 2)
+            antardasha_age_at_end = round((antardasha_end_date - birth_date).days / TAMIL_YEAR, 2)
         
         # Calculate pratyantar_dashas for current antardasha
         current_pratyantardashas = []
@@ -249,32 +320,46 @@ def calculate_dasha_antardasha(moon_rasi, moon_degree_in_sign, birth_date_str=No
             )
             # Add start_date and end_date for each pratyantar_dasha
             for pratyantar in current_pratyantardashas:
-                pratyantar['start_date'] = (antardasha_start_date + timedelta(days=pratyantar['start_day'])).strftime('%Y-%m-%d')
-                pratyantar['end_date'] = (antardasha_start_date + timedelta(days=pratyantar['end_day'])).strftime('%Y-%m-%d')
-        
+                pt_start = antardasha_start_date + timedelta(days=pratyantar['start_day'])
+                pt_end = antardasha_start_date + timedelta(days=pratyantar['end_day'])
+                pratyantar['start_date'] = pt_start.strftime('%Y-%m-%d')
+                pratyantar['end_date'] = pt_end.strftime('%Y-%m-%d')
+                pratyantar['age_at_start'] = round((pt_start - birth_date).days / TAMIL_YEAR, 2)
+                pratyantar['age_at_end'] = round((pt_end - birth_date).days / TAMIL_YEAR, 2)
+
         # Calculate pratyantar_dashas for all antardashas
         all_antardashas_with_pratyantar = []
         for ad in antardashas:
             antardasha_start = current_dasha_start_date + timedelta(days=ad['start_day'])
+            antardasha_end = current_dasha_start_date + timedelta(days=ad['end_day'])
             pratyantardashas = calculate_pratyantardashas(ad['lord'], ad['period_years'])
             # Add start_date and end_date for each pratyantar_dasha
             for pratyantar in pratyantardashas:
-                pratyantar['start_date'] = (antardasha_start + timedelta(days=pratyantar['start_day'])).strftime('%Y-%m-%d')
-                pratyantar['end_date'] = (antardasha_start + timedelta(days=pratyantar['end_day'])).strftime('%Y-%m-%d')
-            
+                pt_start = antardasha_start + timedelta(days=pratyantar['start_day'])
+                pt_end = antardasha_start + timedelta(days=pratyantar['end_day'])
+                pratyantar['start_date'] = pt_start.strftime('%Y-%m-%d')
+                pratyantar['end_date'] = pt_end.strftime('%Y-%m-%d')
+                pratyantar['age_at_start'] = round((pt_start - birth_date).days / TAMIL_YEAR, 2)
+                pratyantar['age_at_end'] = round((pt_end - birth_date).days / TAMIL_YEAR, 2)
+
             all_antardashas_with_pratyantar.append({
                 'lord': ad['lord'],
                 'period_years': round(ad['period_years'], 4),
                 'period_days': round(ad['period_days'], 2),
                 'start_date': antardasha_start.strftime('%Y-%m-%d'),
-                'end_date': (current_dasha_start_date + timedelta(days=ad['end_day'])).strftime('%Y-%m-%d'),
+                'end_date': antardasha_end.strftime('%Y-%m-%d'),
+                'age_at_start': round((antardasha_start - birth_date).days / TAMIL_YEAR, 2),
+                'age_at_end': round((antardasha_end - birth_date).days / TAMIL_YEAR, 2),
+                'planet_info': get_planet_chart_info(ad['lord'], chart_data),
                 'pratyantardashas': [
                     {
                         'lord': p['lord'],
                         'period_years': round(p['period_years'], 4),
                         'period_days': round(p['period_days'], 2),
                         'start_date': p['start_date'],
-                        'end_date': p['end_date']
+                        'end_date': p['end_date'],
+                        'age_at_start': p['age_at_start'],
+                        'age_at_end': p['age_at_end']
                     }
                     for p in pratyantardashas
                 ]
@@ -291,7 +376,11 @@ def calculate_dasha_antardasha(moon_rasi, moon_degree_in_sign, birth_date_str=No
                 'start_date': current_dasha_start_date.strftime('%Y-%m-%d'),
                 'end_date': current_dasha_end_date.strftime('%Y-%m-%d'),
                 'total_period_years': current_dasha_total_years,
-                'is_birth_dasha': (current_dasha_lord == birth_dasha_lord)
+                'is_birth_dasha': (current_dasha_lord == birth_dasha_lord),
+                'current_age': current_age,
+                'age_at_start': dasha_age_at_start,
+                'age_at_end': dasha_age_at_end,
+                'planet_info': get_planet_chart_info(current_dasha_lord, chart_data)
             },
             'current_antardasha': {
                 'lord': current_antardasha['lord'] if current_antardasha else None,
@@ -300,13 +389,18 @@ def calculate_dasha_antardasha(moon_rasi, moon_degree_in_sign, birth_date_str=No
                 'remaining_days': round(current_antardasha['remaining_days'], 2) if current_antardasha and 'remaining_days' in current_antardasha else None,
                 'start_date': antardasha_start_date.strftime('%Y-%m-%d') if antardasha_start_date else None,
                 'end_date': antardasha_end_date.strftime('%Y-%m-%d') if antardasha_end_date else None,
+                'age_at_start': antardasha_age_at_start,
+                'age_at_end': antardasha_age_at_end,
+                'planet_info': get_planet_chart_info(current_antardasha['lord'], chart_data) if current_antardasha else None,
                 'pratyantardashas': [
                     {
                         'lord': p['lord'],
                         'period_years': round(p['period_years'], 4),
                         'period_days': round(p['period_days'], 2),
                         'start_date': p['start_date'],
-                        'end_date': p['end_date']
+                        'end_date': p['end_date'],
+                        'age_at_start': p.get('age_at_start'),
+                        'age_at_end': p.get('age_at_end')
                     }
                     for p in current_pratyantardashas
                 ] if current_antardasha else []
@@ -332,7 +426,7 @@ def calculate_dasha_antardasha(moon_rasi, moon_degree_in_sign, birth_date_str=No
         }
 
 
-def calculate_all_dashas_120_years(moon_rasi, moon_degree_in_sign, birth_date_str):
+def calculate_all_dashas_120_years(moon_rasi, moon_degree_in_sign, birth_date_str, chart_data=None):
     """
     Calculate all dashas for 120 years (complete Vimshottari Dasha cycle)
     Args:
@@ -465,28 +559,37 @@ def calculate_all_dashas_120_years(moon_rasi, moon_degree_in_sign, birth_date_st
                         'period_years': round(pratyantar_period_years, 4),
                         'period_days': round(pratyantar_period_days, 2),
                         'start_date': pratyantar_start_date.strftime('%Y-%m-%d'),
-                        'end_date': pratyantar_end_date.strftime('%Y-%m-%d')
+                        'end_date': pratyantar_end_date.strftime('%Y-%m-%d'),
+                        'age_at_start': round((pratyantar_start_date - birth_date).days / TAMIL_YEAR, 2),
+                        'age_at_end': round((pratyantar_end_date - birth_date).days / TAMIL_YEAR, 2),
+                        'planet_info': get_planet_chart_info(pratyantar_lord, chart_data)
                     })
-                    
+
                     pratyantar_start_date = pratyantar_end_date
-                
+
                 antardashas.append({
                     'lord': antardasha_lord,
                     'period_years': round(antardasha_period_years, 4),
                     'period_days': round(antardasha_period_days, 2),
                     'start_date': antardasha_start_date.strftime('%Y-%m-%d'),
                     'end_date': antardasha_end_date.strftime('%Y-%m-%d'),
+                    'age_at_start': round((antardasha_start_date - birth_date).days / TAMIL_YEAR, 2),
+                    'age_at_end': round((antardasha_end_date - birth_date).days / TAMIL_YEAR, 2),
+                    'planet_info': get_planet_chart_info(antardasha_lord, chart_data),
                     'pratyantardashas': pratyantardashas
                 })
-                
+
                 antardasha_start_date = antardasha_end_date
-            
+
             all_dashas.append({
                 'lord': current_dasha_lord,
                 'period_years': round(total_dasha_years, 4),
                 'period_days': round(dasha_period_days, 2),
                 'start_date': dasha_start_date.strftime('%Y-%m-%d'),
                 'end_date': dasha_end_date.strftime('%Y-%m-%d'),
+                'age_at_start': round((dasha_start_date - birth_date).days / TAMIL_YEAR, 2),
+                'age_at_end': round((dasha_end_date - birth_date).days / TAMIL_YEAR, 2),
+                'planet_info': get_planet_chart_info(current_dasha_lord, chart_data),
                 'antardashas': antardashas
             })
             
