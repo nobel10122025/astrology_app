@@ -363,16 +363,17 @@ def dasha_info():
         moon_rasi = data.get('moon', {}).get('house', '')
         moon_degree = data.get('moon', {}).get('degree', '0')
         birth_date = data.get('birth_date')  # Optional birth date (YYYY-MM-DD format)
-        
+        chart_data = data.get('chart_data')  # Optional full chart data for planet info
+
         if not moon_rasi or not moon_degree:
             return jsonify({
                 'error': 'Moon rasi and degree are required',
                 'status': 'error'
             }), 400
-        
+
         try:
             moon_degree_float = float(moon_degree)
-            dasha_info = calculate_dasha_antardasha(moon_rasi, moon_degree_float, birth_date)
+            dasha_info = calculate_dasha_antardasha(moon_rasi, moon_degree_float, birth_date, chart_data)
             
             if dasha_info:
                 return jsonify({
@@ -409,22 +410,23 @@ def all_dashas():
         moon_rasi = data.get('moon', {}).get('house', '')
         moon_degree = data.get('moon', {}).get('degree', '0')
         birth_date = data.get('birth_date')  # Required birth date (YYYY-MM-DD format)
-        
+        chart_data = data.get('chart_data')  # Optional full chart data for planet info
+
         if not moon_rasi or not moon_degree:
             return jsonify({
                 'error': 'Moon rasi and degree are required',
                 'status': 'error'
             }), 400
-        
+
         if not birth_date:
             return jsonify({
                 'error': 'Birth date is required',
                 'status': 'error'
             }), 400
-        
+
         try:
             moon_degree_float = float(moon_degree)
-            all_dashas_info = calculate_all_dashas_120_years(moon_rasi, moon_degree_float, birth_date)
+            all_dashas_info = calculate_all_dashas_120_years(moon_rasi, moon_degree_float, birth_date, chart_data)
             
             if all_dashas_info:
                 return jsonify({

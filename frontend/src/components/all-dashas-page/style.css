@@ -351,3 +351,32 @@
   }
 }
 
+
+.planet-info-block {
+  margin-top: 0.4rem;
+  padding: 0.4rem 0.65rem;
+  background: rgba(0, 0, 0, 0.05);
+  border-left: 3px solid var(--theme-accent, #6c5ce7);
+  border-radius: 0 6px 6px 0;
+}
+
+.planet-info-row {
+  display: flex;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  margin-bottom: 0.18rem;
+}
+
+.planet-info-row:last-child {
+  margin-bottom: 0;
+}
+
+.planet-info-label {
+  font-weight: 600;
+  opacity: 0.72;
+  white-space: nowrap;
+}
+
+.planet-info-value {
+  opacity: 0.88;
+}

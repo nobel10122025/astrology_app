@@ -24,6 +24,46 @@ const DashaDisplay = ({ dasha }) => {
     mercury: "Mercury",
   };
 
+  const ordinal = (n) => {
+    const s = ['th', 'st', 'nd', 'rd'];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  };
+
+  const PlanetInfo = ({ info }) => {
+    if (!info) return null;
+    return (
+      <div className="planet-info-block">
+        {info.owned_houses && info.owned_houses.length > 0 && (
+          <div className="planet-info-row">
+            <span className="planet-info-label">Owns:</span>
+            <span className="planet-info-value">{info.owned_houses.map(h => ordinal(h)).join(', ')}</span>
+          </div>
+        )}
+        {info.placed_in_house && (
+          <div className="planet-info-row">
+            <span className="planet-info-label">Placed in:</span>
+            <span className="planet-info-value">{ordinal(info.placed_in_house)} house</span>
+          </div>
+        )}
+        {info.aspects_houses && info.aspects_houses.length > 0 && (
+          <div className="planet-info-row">
+            <span className="planet-info-label">Aspects:</span>
+            <span className="planet-info-value">{info.aspects_houses.map(h => ordinal(h)).join(', ')}</span>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const formatAge = (age) => {
+    if (age === null || age === undefined) return null;
+    const whole = Math.floor(age);
+    const months = Math.round((age - whole) * 12);
+    if (months === 0) return `${whole} yrs`;
+    return `${whole} yrs ${months} mo`;
+  };
+
   const formatYears = (years) => {
     if (years < 1) {
       const months = Math.floor(years * 12);
@@ -110,6 +150,19 @@ const DashaDisplay = ({ dasha }) => {
               <span className="dasha-value">{dashaInfo.end_date}</span>
             </div>
           )}
+          {dashaInfo.current_age !== undefined && (
+            <div className="dasha-info-row">
+              <span className="dasha-label">Current Age:</span>
+              <span className="dasha-value dasha-lord">{formatAge(dashaInfo.current_age)}</span>
+            </div>
+          )}
+          {dashaInfo.age_at_start !== undefined && dashaInfo.age_at_end !== undefined && (
+            <div className="dasha-info-row">
+              <span className="dasha-label">Age Range:</span>
+              <span className="dasha-value">{formatAge(dashaInfo.age_at_start)} – {formatAge(dashaInfo.age_at_end)}</span>
+            </div>
+          )}
+          <PlanetInfo info={dashaInfo.planet_info} />
         </div>
 
         {current_antardasha && (
@@ -144,6 +197,13 @@ const DashaDisplay = ({ dasha }) => {
                   <span className="dasha-value">{current_antardasha.end_date}</span>
                 </div>
               )}
+              {current_antardasha.age_at_start !== undefined && current_antardasha.age_at_end !== undefined && (
+                <div className="dasha-info-row">
+                  <span className="dasha-label">Age Range:</span>
+                  <span className="dasha-value">{formatAge(current_antardasha.age_at_start)} – {formatAge(current_antardasha.age_at_end)}</span>
+                </div>
+              )}
+              <PlanetInfo info={current_antardasha.planet_info} />
               {current_antardasha.pratyantardashas && current_antardasha.pratyantardashas.length > 0 && (
                 <div className="dasha-info-row">
                   <span className="dasha-label">Pratyantar Dashas:</span>
@@ -190,8 +250,15 @@ const DashaDisplay = ({ dasha }) => {
                         <span className="antardasha-date-label">End:</span>
                         <span className="antardasha-date-value">{antardasha.end_date}</span>
                       </div>
+                      {antardasha.age_at_start !== undefined && antardasha.age_at_end !== undefined && (
+                        <div className="antardasha-date-row">
+                          <span className="antardasha-date-label">Age:</span>
+                          <span className="antardasha-date-value">{formatAge(antardasha.age_at_start)} – {formatAge(antardasha.age_at_end)}</span>
+                        </div>
+                      )}
                     </div>
                   )}
+                  <PlanetInfo info={antardasha.planet_info} />
                   {antardasha.pratyantardashas && antardasha.pratyantardashas.length > 0 && (
                     <div className="antardasha-pratyantar-hint">
                       Click to view Pratyantar Dashas ({antardasha.pratyantardashas.length})
@@ -236,8 +303,15 @@ const DashaDisplay = ({ dasha }) => {
                       <span className="summary-label">End Date:</span>
                       <span className="summary-value">{selectedAntardasha.end_date}</span>
                     </div>
+                    {selectedAntardasha.age_at_start !== undefined && selectedAntardasha.age_at_end !== undefined && (
+                      <div className="summary-row">
+                        <span className="summary-label">Age Range:</span>
+                        <span className="summary-value">{formatAge(selectedAntardasha.age_at_start)} – {formatAge(selectedAntardasha.age_at_end)}</span>
+                      </div>
+                    )}
                   </>
                 )}
+                <PlanetInfo info={selectedAntardasha.planet_info} />
               </div>
               {selectedAntardasha.pratyantardashas && selectedAntardasha.pratyantardashas.length > 0 ? (
                 <div className="pratyantar-list">
@@ -260,6 +334,12 @@ const DashaDisplay = ({ dasha }) => {
                           <span className="pratyantar-date-label">End:</span>
                           <span className="pratyantar-date-value">{pratyantar.end_date}</span>
                         </div>
+                        {pratyantar.age_at_start !== undefined && pratyantar.age_at_end !== undefined && (
+                          <div className="pratyantar-date-row">
+                            <span className="pratyantar-date-label">Age:</span>
+                            <span className="pratyantar-date-value">{formatAge(pratyantar.age_at_start)} – {formatAge(pratyantar.age_at_end)}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}

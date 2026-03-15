@@ -20,6 +20,7 @@ export const useAstrologyForm = () => {
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
   const [moonDataForDashas, setMoonDataForDashas] = useState(null);
+  const [chartDataForDashas, setChartDataForDashas] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -121,9 +122,12 @@ export const useAstrologyForm = () => {
       let dashaData = null;
       if (transformedData.moon && transformedData.moon.house && transformedData.moon.degree) {
         try {
+          const { moon, ascendant, sun, mars, mercury, jupiter, venus, saturn, rahu, ketu } = transformedData;
+          const chartData = { ascendant, sun, moon, mars, mercury, jupiter, venus, saturn, rahu, ketu };
           const dashaPayload = {
-            moon: transformedData.moon,
-            birth_date: formData.dateOfBirth
+            moon,
+            birth_date: formData.dateOfBirth,
+            chart_data: chartData
           };
           const dashaResponse = await fetch(
             `${API_BASE_URL}/api/dasha-info`,
@@ -155,6 +159,8 @@ export const useAstrologyForm = () => {
       
       if (transformedData.moon) {
         setMoonDataForDashas(transformedData.moon);
+        const { moon, ascendant, sun, mars, mercury, jupiter, venus, saturn, rahu, ketu } = transformedData;
+        setChartDataForDashas({ ascendant, sun, moon, mars, mercury, jupiter, venus, saturn, rahu, ketu });
       }
     } catch (err) {
       setError(err.message || "An error occurred while calculating");
@@ -171,6 +177,7 @@ export const useAstrologyForm = () => {
     results,
     error,
     moonDataForDashas,
+    chartDataForDashas,
     handleSubmit,
   };
 };

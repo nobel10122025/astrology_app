@@ -22,6 +22,7 @@ function App() {
     results,
     error,
     moonDataForDashas,
+    chartDataForDashas,
     handleSubmit,
   } = useAstrologyForm();
   
@@ -43,6 +44,7 @@ function App() {
       <AllDashasPage
         moonData={moonDataForDashas}
         birthDate={formData.dateOfBirth}
+        chartData={chartDataForDashas}
         onBack={() => setCurrentPage("home")}
       />
     );
