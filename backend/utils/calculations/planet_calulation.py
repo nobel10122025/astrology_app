@@ -120,17 +120,16 @@ def calculate_subathuva_pabathuvam(data):
                     pabathuvam_reasons.append(f"Medium/Less conjunction with RAHU (-1)")
             
             # Sun conjunction (neither subathuva nor pabathuvam, but check combust)
+            # NOTE: combustion is scored ONLY via breakdown['combust'], which is added
+            # into final_score separately below. Do not also add it to pabathuvam_points
+            # or the penalty gets applied twice.
             if other_planet == 'sun':
                 combust_degree = COMBUST_DEGREES[planet] if planet in COMBUST_DEGREES else None
                 combust_level = is_combust(planet_pos['degree'], other_pos['degree'], combust_degree)
                 if combust_degree and combust_level == "high":
-                    pabathuvam_points += 2
                     breakdown['combust'] = {'value': -2, 'reason': f'Planet is combust (within {combust_degree}° of Sun)'}
-                    pabathuvam_reasons.append("Combustion with Sun (-2)")
                 elif combust_degree and combust_level == "low":
-                    pabathuvam_points += 1
                     breakdown['combust'] = {'value': -1, 'reason': f'Planet is combust (within {combust_degree}° of Sun)'}
-                    pabathuvam_reasons.append("Combustion with Sun (-1)")
         
         # 2. Aspect Analysis
         for other_planet in PLANETS:
@@ -192,7 +191,7 @@ def calculate_subathuva_pabathuvam(data):
                     # Less than 0-90: add to pabathuvam and subtract 1
                     pabathuvam_points += 1
                     connection_type = "conjunction" if has_conjunction else "aspect"
-                    pabathuvam_reasons.append(f"Moon position effect (0-90° from Sun) via {connection_type} with Moon: Pabathuvam (+1)")
+                    pabathuvam_reasons.append(f"Moon position effect ({moon_effect['degree_diff']:.1f}° from Sun, 0-45° band) via {connection_type} with Moon: Pabathuvam (+1)")
                 elif effect_type == 'subathuva':
                     # 90-120 (0.5), 120-160 (1), or 160-180 (2): add to subathuva
                     subathuva_points += multiplier
@@ -223,7 +222,7 @@ def calculate_subathuva_pabathuvam(data):
             moon_7th_house = ((moon_house + 6) % 12) or 12
 
             # Check if current planet is in 6th or 8th house from Moon
-            if planet_pos['house'] == moon_6th_house or planet_pos['house'] == moon_8th_house and planet not in ['rahu', 'ketu', 'sun']:
+            if (planet_pos['house'] == moon_6th_house or planet_pos['house'] == moon_8th_house) and planet not in ['rahu', 'ketu', 'sun']:
                 subathuva_points += 1
                 subathuva_reasons.append(f"Planet in 6th/8th house from Moon (special case): +1")
             

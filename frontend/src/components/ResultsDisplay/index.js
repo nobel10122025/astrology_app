@@ -3,6 +3,7 @@ import CardContent from '../card-content/index';
 import TableContent from '../table-content/index';
 import HeatMap from '../heat-map/index';
 import ProfessionPrediction from '../profession-prediction/index';
+import PredictionCards from '../prediction-cards/index';
 import DashaDisplay from '../dasha-display/index';
 import './ResultsDisplay.css';
 
@@ -201,6 +202,10 @@ const ResultsDisplay = ({
             </button>
           </div>
         </div>
+      )}
+
+      {results.predictions && (
+        <PredictionCards predictions={results.predictions} />
       )}
 
       {results.prediction && results.prediction.profession && (

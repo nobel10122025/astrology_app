@@ -118,6 +118,29 @@ export const useAstrologyForm = () => {
         throw new Error(backendData.error || "Failed to calculate");
       }
 
+      // Fetch age-aware life predictions. narrate:true adds the LLM narrative
+      // (Groq free tier by default; backend falls back to deterministic-only if
+      // the narration call fails, so the cards always render).
+      let predictions = null;
+      try {
+        const predictPayload = {
+          ...transformedData,
+          birth_date: formData.dateOfBirth,
+          name: formData.name,
+          narrate: true,
+        };
+        const predictResponse = await fetch(`${API_BASE_URL}/api/predict`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(predictPayload),
+        });
+        if (predictResponse.ok) {
+          predictions = await predictResponse.json();
+        }
+      } catch (predictErr) {
+        console.warn("Failed to fetch predictions:", predictErr);
+      }
+
       let dashaData = null;
       if (transformedData.moon && transformedData.moon.house && transformedData.moon.degree) {
         try {
@@ -149,7 +172,8 @@ export const useAstrologyForm = () => {
 
       const finalResults = {
         ...backendData,
-        ...(dashaData && { dasha: dashaData })
+        ...(dashaData && { dasha: dashaData }),
+        ...(predictions && { predictions })
       };
       setResults(finalResults);
       
