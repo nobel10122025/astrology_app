@@ -1,27 +1,37 @@
 """
-Profession agent - the first real agent.
+ProfessionMainAgent - a main agent that plans and triggers tools.
 
-Pure declaration: a checklist (10th/2nd/lagna houses + their lords), the
-activators that time a career phase (10th & 2nd lords + career karakas), topics,
-and age minimums. All logic runs in BaseAgent via the rule engine.
+Instead of one fixed routine, this agent is a deterministic PLANNER: it reads the
+person's age, decides the life stage, and triggers the age-appropriate tools
+(who / how good / when / what field / arc), wiring their outputs together into a
+single result. Which tools ran is recorded in detail["tools_run"] for audit.
 
-To add another domain: copy this file, change the declarations, register.
+    age -> plan(stage) -> [tools] -> ProfessionResult -> (merge) -> narrate (LLM)
+
+The tools are the deterministic capabilities in tools/; the only LLM call in the
+whole system remains the narrator at the edge. Output shape is unchanged so the
+frontend cards keep working.
 """
 
-from agents.base_agent import BaseAgent
+from agents.base_agent import AgentResult, BaseAgent
+from agents.profession_planner import resolve_plan
 from agents.registry import AgentRegistry
-from core.chart_query import ChartQuery
-from core.dasha_evaluator import DasaEvaluator
-from core.signification import resolve_fields
+from core.rule_engine import SpecialFlagInjector
+from tools import (
+    career_arc,
+    career_significators,
+    dasha_favourability,
+    field_resolver,
+    strength,
+    timing,
+)
 from utils.constant import PLANET_PROFESSIONS
 
 
-class ProfessionAgent(BaseAgent):
+class ProfessionMainAgent(BaseAgent):
     name = "profession"
     domain = "profession"
     topics = ["profession", "career", "job", "work", "occupation"]
-    min_age = 18
-    realistic_age = 22
 
     CHECKLIST = [
         {"check": "house_strength", "house": 10, "weight": 2},
@@ -32,192 +42,124 @@ class ProfessionAgent(BaseAgent):
         {"check": "lagna_lord_strength", "weight": 1},
     ]
 
-    # Career fires in the dasha/antardasha of the 10th & 2nd lords, or of the
-    # classic career karakas (Sun=authority, Saturn=work/service, Mercury=skill).
+    # Career fires in the dasha of the 10th & 2nd lords, or the career karakas.
     ACTIVATOR_HOUSES = [10, 2]
     ACTIVATOR_PLANETS = ["sun", "saturn", "mercury"]
 
     # The career houses whose "connection in any way" determines the field.
     CAREER_HOUSES = [10, 2]
 
-    # Life-stage boundaries (years). Judgment calls - tune against known charts.
-    LIFE_STAGE_START_MAX = 30   # below this: career still forming
-    LIFE_STAGE_LATE_MIN = 55    # at/above this: late career
+    def run(self, ctx):
+        """Trigger significators, let the planner decide the rest, assemble."""
+        ran = []
 
-    def _life_stage(self, age):
-        if age is None or age < self.LIFE_STAGE_START_MAX:
-            return "start"
-        if age >= self.LIFE_STAGE_LATE_MIN:
-            return "late"
-        return "mid"
+        # WHO shapes the career (always; its facts also inform planning) -------
+        sig = career_significators.run(ctx, tuple(self.CAREER_HOUSES))
+        ran.append(career_significators.NAME)
+        connected = sig["connected"]
+        ranked = sig["ranked"]
+        career_planets = sig["career_planets"]
 
-    def _governing_planet(self, phase, ranked):
-        """Which career planet's FIELD governs a dasha phase.
-
-        If the dasha lord is itself a career planet, that planet's field leads.
-        Otherwise the natal strongest career planet governs during favourable
-        periods; during unfavourable periods the second-strongest does (the
-        person tends to end up in the lesser field while the dasha is weak)."""
-        if phase["lord"] in ranked:
-            return phase["lord"], "dasha lord is a career planet"
-        if phase["favourable"] or len(ranked) == 1:
-            return ranked[0], "strongest career planet (favourable period)"
-        return ranked[1], "second career planet (unfavourable period)"
-
-    def refine(self, ctx, result):
-        """Life-stage-aware career arc.
-
-        Career-defining planets are those CONNECTED to the career houses (10th,
-        2nd) in any way - ranked by strength. But the FIELD is not one static
-        answer: it tracks the dasha timeline. A person may sit in a lesser field
-        during an unfavourable dasha and shift when a favourable one begins.
-
-        - start of life  -> career is still forming: predict the field the
-          strongest career planet builds, timed to the coming favourable dasha.
-          (Looking at "the next 2 dashas" to pick a planet is meaningless here.)
-        - mid / late     -> read the arc: the current dasha shows the field they
-          are likely in now, and a change of governing planet (or an
-          unfavourable->favourable turn) ahead flags a possible career SHIFT,
-          with its age window.
-        """
-        q = ChartQuery(ctx)
-        connected = q.planets_connected_to_group(self.CAREER_HOUSES)
-        ranked = [p for p in connected if p in PLANET_PROFESSIONS]
-        ranked.sort(key=lambda p: ctx.scores.get(p, 0), reverse=True)
-        if not ranked:
-            result.detail["profession_planets"] = []
-            result.detail["indicated_professions"] = []
-            return result
-
-        # Semantic layer: combine the significations (meaning tags) of the top
-        # career-connected planets - their own tags + their sign's + their
-        # house's - into ranked SPECIFIC fields (e.g. government + astronomy ->
-        # space research / ISRO-NASA). This answers "what field", where the
-        # score only answers "how good / when".
-        career_planets = list(connected)[:3]
-        result.detail["field_profile"] = resolve_fields(career_planets, ctx)
-
-        life_stage = self._life_stage(ctx.current_age)
-        phases = DasaEvaluator.mahadasha_phases(ctx)
-
-        # No timeline (no birth date): fall back to natal strength only.
-        if not phases:
-            ordered = ranked[:2]
-            self._attach(result, ordered, connected)
-            result.detail["career_arc"] = {"life_stage": life_stage, "phases": []}
-            result.detail["career_shift"] = None
-            result.detail["profession_selection"] = {
-                "chosen": ordered[0],
-                "reason": f"{ordered[0]} chosen on natal strength (no dasha timeline)",
-            }
-            return result
-
-        past = [p for p in phases if p["tag"] == "PAST"]
-        active = [p for p in phases if p["tag"] == "ACTIVE"]
-        upcoming = [p for p in phases if p["tag"] == "UPCOMING"]
-
-        # Window of relevant phases. The young get a forward-looking window; the
-        # established also get the most recent past for "how you got here".
-        if life_stage == "start":
-            window = active[:1] + upcoming[:2]
-        else:
-            window = past[-1:] + active[:1] + upcoming[:2]
-        if not window:
-            window = phases[:3]
-
-        arc = []
-        for p in window:
-            g, why = self._governing_planet(p, ranked)
-            arc.append({
-                "lord": p["lord"],
-                "tag": p["tag"],
-                "favourable": p["favourable"],
-                "score": p["score"],
-                "age_start": p.get("age_start"),
-                "age_end": p.get("age_end"),
-                "governing_planet": g,
-                "governing_reason": why,
-                "field_sample": PLANET_PROFESSIONS.get(g, [])[:3],
-            })
-
-        # First meaningful transition INTO A FUTURE period = a career shift
-        # (field change) or a fortune turn (unfavourable -> favourable). Only
-        # UPCOMING transitions count; a shift into the current period already
-        # happened and is not a prediction.
-        shift = None
-        for prev, nxt in zip(arc, arc[1:]):
-            if nxt["tag"] != "UPCOMING":
-                continue
-            field_change = nxt["governing_planet"] != prev["governing_planet"]
-            fortune_up = (not prev["favourable"]) and nxt["favourable"]
-            if field_change or fortune_up:
-                shift = {
-                    "type": "field_change" if field_change else "fortune_change",
-                    "from_planet": prev["governing_planet"],
-                    "to_planet": nxt["governing_planet"],
-                    "at_age": nxt.get("age_start"),
-                    "dasa": nxt["lord"],
-                    "favourable_after": nxt["favourable"],
-                }
-                break
-
-        # Primary field: what the person builds (start) or is in now (mid/late).
-        if life_stage == "start":
-            primary_planet = ranked[0]
-            reason = (
-                f"early career: field forms around {primary_planet}"
-                + (f", establishing near age {shift['at_age']}" if shift else "")
-            )
-        else:
-            current = active[0] if active else window[0]
-            primary_planet, _ = self._governing_planet(current, ranked)
-            if shift and shift["type"] == "field_change":
-                reason = (
-                    f"currently a {primary_planet} field; possible shift toward "
-                    f"{shift['to_planet']} around age {shift['at_age']} "
-                    f"({shift['dasa'].title()} dasha)"
-                )
-            elif shift and shift["type"] == "fortune_change":
-                reason = (
-                    f"{primary_planet} field strengthens around age "
-                    f"{shift['at_age']} as the dasha turns favourable"
-                )
-            else:
-                reason = f"established {primary_planet} field, steady through upcoming dashas"
-
-        # Field list: primary first, then any shift target, then remaining ranked.
-        order_seed = [primary_planet]
-        if shift:
-            order_seed.append(shift["to_planet"])
-        order_seed += [a["governing_planet"] for a in arc] + ranked
-        ordered = []
-        for g in order_seed:
-            if g and g not in ordered:
-                ordered.append(g)
-
-        self._attach(result, ordered, connected)
-        result.detail["career_arc"] = {"life_stage": life_stage, "phases": arc}
-        result.detail["career_shift"] = shift
-        result.detail["profession_selection"] = {
-            "chosen": primary_planet,
-            "life_stage": life_stage,
-            "reason": reason,
+        # PLAN: the LLM decides which further tools to run (deterministic
+        # fallback if the LLM is unavailable). It chooses tools, not astrology.
+        plan_context = {
+            "age": ctx.current_age,
+            "has_dasha_timeline": bool(ctx.tagged_periods),
+            "num_career_planets": len(ranked),
+            "active_dasha": ctx.active_dasha,
         }
-        return result
+        stage, tool_plan, planner_kind, planner_reasoning = resolve_plan(plan_context)
+        detail = {
+            "life_stage": stage,
+            "planner": {
+                "kind": planner_kind,
+                "tools": tool_plan,
+                "reasoning": planner_reasoning,
+            },
+        }
 
-    @staticmethod
-    def _attach(result, ordered, connected):
-        """Attach the field list, professions, and connection evidence."""
+        # WHAT field (always) -------------------------------------------------
+        detail["field_profile"] = field_resolver.run(ctx, career_planets)
+        ran.append(field_resolver.NAME)
+
+        # HOW GOOD ------------------------------------------------------------
+        score, breakdown = None, []
+        if strength.NAME in tool_plan:
+            s = strength.run(ctx, self.CHECKLIST)
+            score, breakdown = s["score"], s["breakdown"]
+            ran.append(strength.NAME)
+
+        # FIELDS OVER TIME + possible shift -----------------------------------
+        ordered = ranked[:2]
+        primary = ranked[0] if ranked else None
+        sel_reason = f"{stage} aptitude from natal significators"
+        if career_arc.NAME in tool_plan and ranked:
+            arc = career_arc.run(ctx, ranked, stage)
+            ran.append(career_arc.NAME)
+            ordered = arc["ordered"] or ordered
+            primary = arc["primary_planet"] or primary
+            sel_reason = arc["reason"]
+            detail["career_arc"] = {"life_stage": stage, "phases": arc["phases"]}
+            detail["career_shift"] = arc["shift"]
+
+        # DASHA CLIMATE -------------------------------------------------------
+        if dasha_favourability.NAME in tool_plan:
+            detail["dasha_outlook"] = dasha_favourability.run(ctx)
+            ran.append(dasha_favourability.NAME)
+
+        # WHEN ----------------------------------------------------------------
+        timing_res = {"timing": "GENERAL", "age_range": None, "dasa_context": None}
+        if timing.NAME in tool_plan:
+            timing_res = timing.run(ctx, self._resolve_activators(ctx))
+            ran.append(timing.NAME)
+
+        tag = timing_res["timing"]
+        if stage == "youth" and tag in ("PAST", "GENERAL"):
+            tag = "UPCOMING"          # a forming career is forward-looking
+        if stage == "child":
+            tag = "GENERAL"           # aptitude, not a timed event
+
+        # Assemble the field list from the chosen planets ---------------------
+        planets_for_fields = ordered if ordered else ranked[:2]
         professions = []
-        for planet in ordered:
-            for job in PLANET_PROFESSIONS.get(planet, []):
+        for p in planets_for_fields:
+            for job in PLANET_PROFESSIONS.get(p, []):
                 if job not in professions:
                     professions.append(job)
-        result.detail["profession_planets"] = ordered
-        result.detail["indicated_professions"] = professions
-        result.detail["career_connections"] = {
-            p: connected[p] for p in ordered if p in connected
+
+        detail["profession_planets"] = planets_for_fields
+        detail["indicated_professions"] = professions
+        detail["career_connections"] = {
+            p: connected[p] for p in planets_for_fields if p in connected
         }
+        detail["profession_selection"] = {
+            "chosen": primary,
+            "life_stage": stage,
+            "reason": sel_reason,
+        }
+        detail["tools_run"] = ran
+
+        flags = SpecialFlagInjector.inject(self.domain, ctx)
+        summary = (
+            f"profession: early aptitude ({stage})"
+            if stage == "child"
+            else self._summary(score, tag)
+        )
+
+        return AgentResult(
+            domain=self.domain,
+            topics=self.topics,
+            score=score,
+            summary=summary,
+            timing=tag,
+            age_range=timing_res["age_range"],
+            dasa_context=timing_res["dasa_context"],
+            breakdown=breakdown,
+            special_flags=flags,
+            detail=detail,
+            confidence=self._confidence(score, tag),
+            skipped=False,
+        )
 
 
-AgentRegistry.register(ProfessionAgent())
+AgentRegistry.register(ProfessionMainAgent())
