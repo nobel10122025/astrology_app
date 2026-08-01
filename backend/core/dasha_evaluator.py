@@ -6,32 +6,26 @@ evaluator that any agent can consult - the profession agent uses it to decide
 whether the strongest career planet will actually deliver, marriage-timing could
 use it, and so on.
 
-Favourability of a dasha lord is decided by a small, auditable rule tree over
-the immutable ChartContext:
-
-  1. Base strength  - the planet's own subathuva/pabathuvam score (dignity,
-                      combustion, aspects... already computed by the engine).
-  2. Functional nature - which houses the planet RULES: trikona (5,9) lords are
-                      the most benefic, kendra (4,7,10)/lagna lords are helpful,
-                      dusthana (6,8,12) lords bring friction.
-  3. Placement      - which house the planet SITS in: trikona/kendra good,
-                      dusthana difficult.
-
-Each contribution is recorded as a reason so the verdict is explainable and the
-narrator can say *why* a period reads as supportive or challenging.
+Favourability is decided by the guarded 12-rule Dasa-Bhukti sub-agent in
+`core.dasha_rules`. Each rule states its own applicability condition first ("it
+depends") and only applicable rules feed the verdict; the strength anchor still
+comes from the existing subathuvam/pabathuvam engine. This module keeps the older
+DasaVerdict shape and the timeline helpers (mahadasha_phases / next_periods /
+outlook) so the career arc and other callers are unchanged, while delegating the
+actual judgement to the rule engine.
 """
 
 from dataclasses import asdict, dataclass, field
 
 from core.age_gate import _age_on, _parse
-from core.chart_query import ChartQuery
+from core.dasha_rules import (
+    FAVOURABLE_THRESHOLD,
+    active_period,
+    evaluate,
+    evaluate_period,
+)
 
-KENDRA = {1, 4, 7, 10}
-TRIKONA = {1, 5, 9}
-DUSTHANA = {6, 8, 12}
-
-# A favourability score at or above this (0-10) reads as a supportive period.
-FAVOURABLE_THRESHOLD = 5.5
+__all__ = ["DasaEvaluator", "DasaVerdict", "FAVOURABLE_THRESHOLD"]
 
 
 @dataclass
@@ -41,67 +35,38 @@ class DasaVerdict:
     score: float                 # 0-10 favourability
     tag: str = None              # PAST | ACTIVE | UPCOMING (when from a period)
     reasons: list = field(default_factory=list)
+    findings: list = field(default_factory=list)   # full per-rule breakdown
 
     def to_dict(self):
         return asdict(self)
 
 
 class DasaEvaluator:
-    """Evaluate dasha-lord favourability over a ChartContext."""
-
-    @staticmethod
-    def _houses_owned(ctx, planet):
-        return [h for h, lord in ctx.house_lords.items() if lord == planet]
+    """Evaluate dasha-lord favourability over a ChartContext, via the 12-rule
+    sub-agent in core.dasha_rules."""
 
     @classmethod
-    def evaluate_lord(cls, ctx, planet, tag=None):
+    def evaluate_lord(cls, ctx, planet, tag=None, role="maha"):
         """Favourability verdict for a single dasha lord (a planet)."""
-        q = ChartQuery(ctx)
-        reasons = []
-
-        base = q.strength(planet)
-        if base is None:
-            return DasaVerdict(lord=planet, favourable=False, score=0.0, tag=tag,
-                               reasons=["no chart data for this planet"])
-        reasons.append(f"base strength {base}/10")
-
-        # --- functional nature (what it rules) ---
-        func_adj = 0.0
-        owned = cls._houses_owned(ctx, planet)
-        for h in owned:
-            if h in (5, 9):
-                func_adj += 1.0
-                reasons.append(f"rules trikona {h}th (benefic) +1.0")
-            elif h in KENDRA:
-                func_adj += 0.5
-                reasons.append(f"rules kendra {h}th +0.5")
-            elif h in DUSTHANA:
-                func_adj -= 1.0
-                reasons.append(f"rules dusthana {h}th (friction) -1.0")
-        # keep functional swing bounded so one lordship can't dominate
-        func_adj = max(-2.0, min(2.0, func_adj))
-
-        # --- placement (where it sits) ---
-        place_adj = 0.0
-        house = q.house_of(planet)
-        if house in TRIKONA:
-            place_adj = 1.0
-            reasons.append(f"placed in trikona {house}th +1.0")
-        elif house in KENDRA:
-            place_adj = 0.5
-            reasons.append(f"placed in kendra {house}th +0.5")
-        elif house in DUSTHANA:
-            place_adj = -1.0
-            reasons.append(f"placed in dusthana {house}th -1.0")
-
-        score = round(max(0.0, min(10.0, base + func_adj + place_adj)), 2)
+        fav = evaluate(ctx, planet, role=role, tag=tag)
         return DasaVerdict(
-            lord=planet,
-            favourable=score >= FAVOURABLE_THRESHOLD,
-            score=score,
-            tag=tag,
-            reasons=reasons,
+            lord=fav.lord,
+            favourable=fav.favourable,
+            score=fav.score,
+            tag=fav.tag,
+            reasons=fav.reasons or ["no chart data for this planet"],
+            findings=fav.findings,
         )
+
+    @classmethod
+    def evaluate_period(cls, ctx, maha, bhukti):
+        """Judge a maha+bhukti pair (full rules on each + shashtashtaka)."""
+        return evaluate_period(ctx, maha, bhukti)
+
+    @classmethod
+    def active_period(cls, ctx):
+        """Judge the current maha+bhukti period from ctx.active_dasha."""
+        return active_period(ctx)
 
     @classmethod
     def mahadasha_phases(cls, ctx):

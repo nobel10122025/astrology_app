@@ -1,0 +1,139 @@
+/* Dasha-Bhukti favourability card. Reuses shared classes from prediction-cards
+   (score-row/track/fill, context-pill, prediction-narrative/disclaimer,
+   section-title) which load globally; only dasha-specific styles live here. */
+
+.dasha-card-section {
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 3px solid var(--theme-primary);
+}
+
+.dasha-card {
+  background: var(--theme-bg-gradient);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.dasha-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dasha-lords {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dasha-lord-chip {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.dasha-lord-chip em {
+  font-style: normal;
+  font-weight: 500;
+  opacity: 0.8;
+  font-size: 0.78rem;
+  margin-left: 4px;
+}
+
+.dasha-lord-chip.bhukti {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.fav-badge {
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.fav-yes {
+  background: #1e9e5a;
+  color: #fff;
+}
+.fav-no {
+  background: #d9534f;
+  color: #fff;
+}
+
+.dasha-flag {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.dasha-flag.warn {
+  background: rgba(255, 193, 7, 0.18);
+  border: 1px solid rgba(255, 193, 7, 0.5);
+}
+
+.dasha-rules {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: 12px;
+}
+
+.dasha-rules-label {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  opacity: 0.75;
+  margin-bottom: 8px;
+}
+
+.dasha-rules-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.dasha-rules-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.rule-dot {
+  flex: 0 0 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 6px;
+  background: rgba(255, 255, 255, 0.6);
+}
+.rule-favourable .rule-dot {
+  background: #4ade80;
+}
+.rule-unfavourable .rule-dot {
+  background: #f87171;
+}
+.rule-neutral .rule-dot {
+  background: rgba(255, 255, 255, 0.55);
+}
+.rule-info .rule-dot {
+  background: #7dd3fc;
+}

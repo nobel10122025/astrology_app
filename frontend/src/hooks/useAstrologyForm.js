@@ -141,6 +141,29 @@ export const useAstrologyForm = () => {
         console.warn("Failed to fetch predictions:", predictErr);
       }
 
+      // Dasa-Bhukti favourability verdict (the 12-rule sub-agent) for the
+      // current period, plus its narration. Narrator provider is controlled by
+      // the backend (LLM_PROVIDER env), so this works with Groq or local Ollama.
+      let dashaFavourability = null;
+      try {
+        const dashaFavPayload = {
+          ...transformedData,
+          birth_date: formData.dateOfBirth,
+          name: formData.name,
+          narrate: true,
+        };
+        const dashaFavResponse = await fetch(`${API_BASE_URL}/api/dasha`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dashaFavPayload),
+        });
+        if (dashaFavResponse.ok) {
+          dashaFavourability = await dashaFavResponse.json();
+        }
+      } catch (dashaFavErr) {
+        console.warn("Failed to fetch dasha favourability:", dashaFavErr);
+      }
+
       let dashaData = null;
       if (transformedData.moon && transformedData.moon.house && transformedData.moon.degree) {
         try {
@@ -173,7 +196,8 @@ export const useAstrologyForm = () => {
       const finalResults = {
         ...backendData,
         ...(dashaData && { dasha: dashaData }),
-        ...(predictions && { predictions })
+        ...(predictions && { predictions }),
+        ...(dashaFavourability && { dashaFavourability })
       };
       setResults(finalResults);
       

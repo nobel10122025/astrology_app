@@ -4,6 +4,7 @@ import TableContent from '../table-content/index';
 import HeatMap from '../heat-map/index';
 import ProfessionPrediction from '../profession-prediction/index';
 import PredictionCards from '../prediction-cards/index';
+import DashaCard from '../dasha-card/index';
 import DashaDisplay from '../dasha-display/index';
 import './ResultsDisplay.css';
 
@@ -202,6 +203,15 @@ const ResultsDisplay = ({
             </button>
           </div>
         </div>
+      )}
+
+      {results.dashaFavourability?.dasha?.available && (
+        <DashaCard
+          dasha={results.dashaFavourability.dasha}
+          narrative={results.dashaFavourability.narrative}
+          currentAge={results.dashaFavourability.current_age}
+          activeDasha={results.dashaFavourability.active_dasha}
+        />
       )}
 
       {results.predictions && (
