@@ -61,8 +61,12 @@ dependency — giving observability, caching, retries and fallbacks. Leave it
 unset to call Groq directly (the default). Choose one way for Portkey to reach
 Groq:
 
-- **Virtual key:** set `PORTKEY_VIRTUAL_KEY` (Portkey stores the Groq key, so
-  `GROQ_API_KEY` isn't needed by this service).
+- **Model catalog (recommended):** create an integration in the Portkey
+  dashboard, attach your Groq key to it, and set `PORTKEY_SLUG` to its slug
+  (e.g. `astrology-app-key`). The Groq key then lives in Portkey (drop
+  `GROQ_API_KEY`), and models are auto-addressed as `@<slug>/<model>`.
+- **Virtual key:** set `PORTKEY_VIRTUAL_KEY` (older header form; Portkey stores
+  the Groq key).
 - **Pass-through:** set `PORTKEY_PROVIDER=groq` (default) and `GROQ_API_KEY` is
   forwarded to Groq.
 

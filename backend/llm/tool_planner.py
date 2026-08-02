@@ -18,7 +18,7 @@ the deterministic age-based plan.
 import json
 import os
 
-from llm.llm_client import build_groq_client
+from llm.llm_client import build_groq_client, resolve_model
 
 DEFAULT_MODEL = "llama-3.3-70b-versatile"
 
@@ -78,7 +78,7 @@ def plan_tools(plan_context, provider=None):
     Raises on any LLM/parse error so the caller can fall back deterministically.
     """
     client = _get_client()
-    model = os.environ.get("GROQ_MODEL", DEFAULT_MODEL)
+    model = resolve_model(os.environ.get("GROQ_MODEL", DEFAULT_MODEL))
 
     catalog_text = "\n".join(f"- {name}: {desc}" for name, desc in TOOL_CATALOG.items())
     user = (

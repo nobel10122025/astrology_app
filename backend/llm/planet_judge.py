@@ -32,7 +32,7 @@ import hashlib
 import json
 import os
 
-from llm.llm_client import build_groq_client
+from llm.llm_client import build_groq_client, resolve_model
 
 DEFAULT_MODEL = "llama-3.3-70b-versatile"
 
@@ -157,7 +157,7 @@ def judge(packet, model=None, use_cache=True):
 
     client = _get_client()
     resp = client.chat.completions.create(
-        model=model or os.environ.get("GROQ_MODEL", DEFAULT_MODEL),
+        model=resolve_model(model or os.environ.get("GROQ_MODEL", DEFAULT_MODEL)),
         temperature=0.1,
         max_tokens=900,
         response_format={"type": "json_object"},

@@ -14,7 +14,7 @@ upstream; the model only narrates.
 import json
 import os
 
-from llm.llm_client import build_groq_client
+from llm.llm_client import build_groq_client, resolve_model
 
 # System prompt and disclaimer are shared with the Anthropic builder so both
 # providers speak in the same voice. Importing these does NOT construct a client.
@@ -60,7 +60,7 @@ def build_reading_narrative_groq(reading: dict) -> dict:
     """Turn a structured reading into a narrative via Groq. Mirrors
     llm.response_builder.build_reading_narrative's input/output contract."""
     client = _get_client()
-    model = os.environ.get("GROQ_MODEL", DEFAULT_MODEL)
+    model = resolve_model(os.environ.get("GROQ_MODEL", DEFAULT_MODEL))
 
     user_message = (
         "Here is the structured astrological reading as JSON. Narrate it "
