@@ -22,8 +22,8 @@
 }
 
 .planet-card.expanded {
-    border: 2px solid var(--theme-primary, #667eea);
-    box-shadow: 0 8px 16px color-mix(in srgb, var(--theme-primary, #667eea) 20%, transparent);
+    border: 2px solid var(--theme-primary);
+    box-shadow: 0 8px 16px color-mix(in srgb, var(--theme-primary) 20%, transparent);
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -194,8 +194,8 @@
     margin-top: 4px;
     font-size: 12px;
     font-weight: 600;
-    color: #6a4bb0;
-    background: rgba(118, 75, 162, 0.12);
+    color: var(--theme-secondary);
+    background: color-mix(in srgb, var(--theme-secondary) 14%, transparent);
     border-radius: 8px;
     padding: 6px 10px;
     line-height: 1.35;
@@ -206,7 +206,7 @@
     padding-top: 15px;
     border-top: 1px solid #e0e0e0;
     text-align: center;
-    color: var(--theme-primary, #667eea);
+    color: var(--theme-primary);
     font-size: 12px;
     font-weight: 500;
     transition: color 0.3s ease;
@@ -238,7 +238,7 @@
 
 .detail-section h4 {
     margin: 0 0 12px 0;
-    color: var(--theme-primary, #667eea);
+    color: var(--theme-primary);
     font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -289,7 +289,7 @@
 
 .planet-tag .owned-houses {
     font-size: 11px;
-    color: var(--theme-primary, #667eea);
+    color: var(--theme-primary);
     font-weight: 400;
     margin-left: 4px;
     transition: color 0.3s ease;

@@ -1,9 +1,12 @@
-/* CSS Variables for Theming */
+/* CSS Variables for Theming.
+   These are the pre-JS fallbacks; useTheme() overwrites them from
+   utils/theme-constants.js on mount. Keep them in sync with the `default`
+   theme there so there's no colour flash on first paint. */
 :root {
-  --theme-bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --theme-header-bg: rgba(40, 44, 52, 0.9);
-  --theme-primary: #667eea;
-  --theme-secondary: #764ba2;
+  --theme-bg-gradient: linear-gradient(135deg, #114d47 0%, #0c2f2c 100%);
+  --theme-header-bg: rgba(10, 38, 37, 0.92);
+  --theme-primary: #8f6a1a;
+  --theme-secondary: #2a6f6a;
 }
 
 .App {

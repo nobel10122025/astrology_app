@@ -1,7 +1,7 @@
 .profession-prediction-section {
   margin-top: 40px;
   padding-top: 30px;
-  border-top: 3px solid #667eea;
+  border-top: 3px solid var(--theme-primary);
 }
 
 .section-title {
