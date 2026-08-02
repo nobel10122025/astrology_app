@@ -118,28 +118,30 @@ export const useAstrologyForm = () => {
         throw new Error(backendData.error || "Failed to calculate");
       }
 
-      // Fetch age-aware life predictions. narrate:true adds the LLM narrative
-      // (Groq free tier by default; backend falls back to deterministic-only if
-      // the narration call fails, so the cards always render).
-      let predictions = null;
-      try {
-        const predictPayload = {
-          ...transformedData,
-          birth_date: formData.dateOfBirth,
-          name: formData.name,
-          narrate: true,
-        };
-        const predictResponse = await fetch(`${API_BASE_URL}/api/predict`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(predictPayload),
-        });
-        if (predictResponse.ok) {
-          predictions = await predictResponse.json();
-        }
-      } catch (predictErr) {
-        console.warn("Failed to fetch predictions:", predictErr);
-      }
+      // --- Career / Life Predictions temporarily disabled ------------------
+      // (Was: age-aware life predictions from /api/predict with narrate:true.)
+      // The /api/predict call (and its LLM/Portkey usage) is turned off for
+      // now. `predictions` stays null so the results spread omits it. To
+      // re-enable, uncomment the block below and restore `let`.
+      const predictions = null;
+      // try {
+      //   const predictPayload = {
+      //     ...transformedData,
+      //     birth_date: formData.dateOfBirth,
+      //     name: formData.name,
+      //     narrate: true,
+      //   };
+      //   const predictResponse = await fetch(`${API_BASE_URL}/api/predict`, {
+      //     method: "POST",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify(predictPayload),
+      //   });
+      //   if (predictResponse.ok) {
+      //     predictions = await predictResponse.json();
+      //   }
+      // } catch (predictErr) {
+      //   console.warn("Failed to fetch predictions:", predictErr);
+      // }
 
       // Dasa-Bhukti favourability verdict (the 12-rule sub-agent) for the
       // current period, plus its narration. Narrator provider is controlled by

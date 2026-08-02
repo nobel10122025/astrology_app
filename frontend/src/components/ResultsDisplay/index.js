@@ -2,8 +2,9 @@ import React from 'react';
 import CardContent from '../card-content/index';
 import TableContent from '../table-content/index';
 import HeatMap from '../heat-map/index';
-import ProfessionPrediction from '../profession-prediction/index';
-import PredictionCards from '../prediction-cards/index';
+// Career / Life Predictions temporarily disabled:
+// import ProfessionPrediction from '../profession-prediction/index';
+// import PredictionCards from '../prediction-cards/index';
 import PlanetStrength from '../planet-strength/index';
 import DashaCard from '../dasha-card/index';
 import DashaDisplay from '../dasha-display/index';
@@ -215,19 +216,23 @@ const ResultsDisplay = ({
         />
       )}
 
+      {/* Career / Life Predictions temporarily disabled
       {results.predictions && (
         <PredictionCards predictions={results.predictions} />
       )}
+      */}
 
       {results.planetStrength && (
         <PlanetStrength planetStrength={results.planetStrength} />
       )}
 
+      {/* Career / Profession Prediction temporarily disabled
       {results.prediction && results.prediction.profession && (
         <ProfessionPrediction
           profession={results.prediction.profession}
         />
       )}
+      */}
     </div>
   );
 };
