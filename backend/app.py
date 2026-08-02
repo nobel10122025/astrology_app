@@ -13,6 +13,7 @@ from blueprints.calculate import calculate_bp
 from blueprints.narrative import narrative_bp
 from blueprints.predict import predict_bp
 from blueprints.dasha import dasha_bp
+from blueprints.strength import strength_bp
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -25,6 +26,7 @@ app.register_blueprint(calculate_bp)
 app.register_blueprint(narrative_bp)
 app.register_blueprint(predict_bp)
 app.register_blueprint(dasha_bp)
+app.register_blueprint(strength_bp)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5001)

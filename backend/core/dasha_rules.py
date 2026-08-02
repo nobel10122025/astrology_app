@@ -70,20 +70,11 @@ for _p, _signs in PLANET_OWN_HOUSES.items():
     for _s in _signs:
         RASI_LORD[_s] = _p
 
-HOUSE_SIGNIFICATIONS = {
-    1: "self, health, personality",
-    2: "wealth, family, speech",
-    3: "courage, siblings, effort",
-    4: "home, mother, comfort, vehicles",
-    5: "children, intellect, romance",
-    6: "enemies, disease, service, debts",
-    7: "marriage, partnership, business",
-    8: "longevity, obstacles, inheritance, transformation",
-    9: "fortune, dharma, father, higher learning",
-    10: "career, status, authority",
-    11: "gains, income, elder siblings, friends",
-    12: "loss, expense, foreign, moksha",
-}
+# House meanings now have ONE source: core.house_data, which splits each house
+# into its good and bad significations (needed by the redemption rule - a
+# redeemed dusthana lord gives only the good side). This flat prose form is
+# derived there for the rules below, which only need a label.
+from core.house_data import HOUSE_SIGNIFICATIONS  # noqa: E402
 
 # Life-stage bands (rule 10) - what period of life the dasha grants results in.
 LIFE_STAGE_BANDS = [
