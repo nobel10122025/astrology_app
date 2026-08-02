@@ -12,6 +12,14 @@ const Form = ({ formData, setFormData, handleSubmit, loading }) => {
 
   return (
     <form onSubmit={handleSubmit} className="planetary-form">
+      <div className="form-intro">
+        <p className="eyebrow">Vedic strength analysis</p>
+        <h2 className="form-title">Cast the chart</h2>
+        <p className="form-note">
+          Enter the native's birth details to compute the rāśi chart and planetary strengths.
+        </p>
+      </div>
+
       {/* Personal Information */}
       <div className="form-section">
         <h2>Personal Information</h2>

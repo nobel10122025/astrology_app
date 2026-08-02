@@ -72,7 +72,7 @@ const CardContent = ({ results, expandItem, toggle, is_planet_card }) => {
           >
             <div className="card-header">
               <div className="planet-info">
-                <span className="planet-symbol">🏠</span>
+                {!is_planet_card && <span className="planet-symbol">🏠</span>}
                 <span className="planet-name">
                   {" "}
                   {is_planet_card ? "Planet" : "House"}{" "}

@@ -6,12 +6,15 @@ const Header = ({ theme, setTheme }) => {
   return (
     <header className="App-header">
       <div className="header-content">
-        <div className="header-title">
-          <h1>Subathuvam Pavathuvam</h1>
-          <p>Planetary Position Form</p>
+        <div className="brand">
+          <span className="brand-mark" aria-hidden="true"></span>
+          <div className="brand-text">
+            <span className="brand-name">Subathuvam</span>
+            <span className="brand-sub">Vedic Chart Analysis</span>
+          </div>
         </div>
         <div className="theme-selector">
-          <label htmlFor="theme-select">Theme:</label>
+          <label htmlFor="theme-select">Palette</label>
           <select
             id="theme-select"
             value={theme}

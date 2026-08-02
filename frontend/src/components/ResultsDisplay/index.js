@@ -30,7 +30,10 @@ const ResultsDisplay = ({
 
   return (
     <div className="results-container">
-      <h2>Calculation Results</h2>
+      <div className="section-head">
+        <p className="eyebrow">Graha &amp; bhava strengths</p>
+        <h2>Chart analysis</h2>
+      </div>
 
       {results.chart_html && (
         <div
@@ -40,20 +43,24 @@ const ResultsDisplay = ({
       )}
 
       <div className="summary">
-        <p>
-          <strong>Total Planets:</strong> {results.summary.total_planets}
-        </p>
-        <p>
-          <strong>Average Planet Score:</strong> {results.summary.average_score}
-        </p>
+        <div className="stat-tile">
+          <span className="stat-label">Planets</span>
+          <span className="stat-val">{results.summary.total_planets}</span>
+        </div>
+        <div className="stat-tile">
+          <span className="stat-label">Avg planet score</span>
+          <span className="stat-val accent mono">{results.summary.average_score}</span>
+        </div>
         {results.summary.total_houses && (
           <>
-            <p>
-              <strong>Total Houses:</strong> {results.summary.total_houses}
-            </p>
-            <p>
-              <strong>Average House Score:</strong> {results.summary.average_house_score}
-            </p>
+            <div className="stat-tile">
+              <span className="stat-label">Houses</span>
+              <span className="stat-val">{results.summary.total_houses}</span>
+            </div>
+            <div className="stat-tile">
+              <span className="stat-label">Avg house score</span>
+              <span className="stat-val mono">{results.summary.average_house_score}</span>
+            </div>
           </>
         )}
       </div>
