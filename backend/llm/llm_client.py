@@ -69,6 +69,21 @@ def resolve_model(model):
     return model
 
 
+def describe_routing():
+    """One-line, secret-free summary of how Groq calls are routed, for logging
+    at startup so a deploy can confirm Portkey is actually picked up."""
+    if not os.environ.get("PORTKEY_API_KEY"):
+        via = "OFF (direct to Groq)"
+    elif os.environ.get("PORTKEY_SLUG"):
+        via = f"ON via Portkey (model catalog: {os.environ['PORTKEY_SLUG']})"
+    elif os.environ.get("PORTKEY_VIRTUAL_KEY"):
+        via = "ON via Portkey (virtual key)"
+    else:
+        provider = os.environ.get("PORTKEY_PROVIDER", "groq")
+        via = f"ON via Portkey (pass-through, provider: {provider})"
+    return f"Portkey routing: {via}"
+
+
 def build_groq_client():
     """Construct the OpenAI-compatible client for Groq.
 

@@ -14,6 +14,11 @@ from blueprints.narrative import narrative_bp
 from blueprints.predict import predict_bp
 from blueprints.dasha import dasha_bp
 from blueprints.strength import strength_bp
+from llm.llm_client import describe_routing
+
+# Log LLM routing once at import so it shows under both `python app.py` and
+# gunicorn (which imports this module). Secret-free - see describe_routing().
+print(f"[startup] {describe_routing()}", flush=True)
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
