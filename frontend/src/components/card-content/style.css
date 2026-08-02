@@ -113,6 +113,94 @@
     color: #333;
 }
 
+/* --- Planet three-track display (replaces final_score on planet cards) --- */
+.planet-tracks {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ptrack-row {
+    display: grid;
+    grid-template-columns: 1fr 90px 42px;
+    align-items: center;
+    gap: 10px;
+}
+
+.ptrack-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #444;
+}
+
+.ptrack-bar {
+    position: relative;
+    height: 8px;
+    border-radius: 999px;
+    background: #eceef5;
+    overflow: hidden;
+}
+
+.ptrack-center {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.28);
+    z-index: 1;
+}
+
+.ptrack-fill {
+    position: absolute;
+    top: 0;
+    height: 100%;
+}
+
+.ptrack-fill.pos {
+    background: #28a745;
+    border-radius: 0 999px 999px 0;
+}
+
+.ptrack-fill.neg {
+    background: #dc3545;
+    border-radius: 999px 0 0 999px;
+}
+
+.ptrack-val {
+    font-size: 13px;
+    font-weight: 700;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.ptrack-val.pos {
+    color: #1f7a45;
+}
+
+.ptrack-val.neg {
+    color: #b02a37;
+}
+
+.ptrack-val.zero,
+.ptrack-label + .ptrack-bar + .ptrack-val.zero {
+    color: #999;
+}
+
+.mutual-exchange-badge {
+    margin-top: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6a4bb0;
+    background: rgba(118, 75, 162, 0.12);
+    border-radius: 8px;
+    padding: 6px 10px;
+    line-height: 1.35;
+}
+
 .expand-indicator {
     margin-top: 15px;
     padding-top: 15px;
