@@ -5,7 +5,8 @@ import HeatMap from '../heat-map/index';
 // Career / Life Predictions temporarily disabled:
 // import ProfessionPrediction from '../profession-prediction/index';
 // import PredictionCards from '../prediction-cards/index';
-import PlanetStrength from '../planet-strength/index';
+// Planet-strength panel temporarily disabled (endpoint being made accurate):
+// import PlanetStrength from '../planet-strength/index';
 import DashaCard from '../dasha-card/index';
 import DashaDisplay from '../dasha-display/index';
 import './ResultsDisplay.css';
@@ -222,9 +223,11 @@ const ResultsDisplay = ({
       )}
       */}
 
+      {/* Planet-strength panel temporarily disabled (endpoint being made accurate)
       {results.planetStrength && (
         <PlanetStrength planetStrength={results.planetStrength} />
       )}
+      */}
 
       {/* Career / Profession Prediction temporarily disabled
       {results.prediction && results.prediction.profession && (
