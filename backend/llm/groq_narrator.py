@@ -14,13 +14,12 @@ upstream; the model only narrates.
 import json
 import os
 
-from openai import OpenAI
+from llm.llm_client import build_groq_client
 
 # System prompt and disclaimer are shared with the Anthropic builder so both
 # providers speak in the same voice. Importing these does NOT construct a client.
 from llm.response_builder import DISCLAIMER, SYSTEM_PROMPT
 
-GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 # Strong, free Groq model. Override with GROQ_MODEL if you prefer a smaller/
 # faster one (e.g. llama-3.1-8b-instant).
 DEFAULT_MODEL = "llama-3.3-70b-versatile"
@@ -49,14 +48,11 @@ _client = None
 
 
 def _get_client():
-    """Lazily construct the Groq client so importing this module never requires
-    GROQ_API_KEY to be set."""
+    """Lazily construct the Groq client (direct, or via Portkey when
+    PORTKEY_API_KEY is set) so importing this module never requires a key."""
     global _client
     if _client is None:
-        api_key = os.environ.get("GROQ_API_KEY")
-        if not api_key:
-            raise RuntimeError("GROQ_API_KEY is not set")
-        _client = OpenAI(base_url=GROQ_BASE_URL, api_key=api_key)
+        _client = build_groq_client()
     return _client
 
 

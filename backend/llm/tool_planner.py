@@ -18,9 +18,8 @@ the deterministic age-based plan.
 import json
 import os
 
-from openai import OpenAI
+from llm.llm_client import build_groq_client
 
-GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 DEFAULT_MODEL = "llama-3.3-70b-versatile"
 
 VALID_STAGES = ["child", "youth", "mid", "late"]
@@ -62,10 +61,7 @@ _client = None
 def _get_client():
     global _client
     if _client is None:
-        api_key = os.environ.get("GROQ_API_KEY")
-        if not api_key:
-            raise RuntimeError("GROQ_API_KEY is not set")
-        _client = OpenAI(base_url=GROQ_BASE_URL, api_key=api_key)
+        _client = build_groq_client()
     return _client
 
 
