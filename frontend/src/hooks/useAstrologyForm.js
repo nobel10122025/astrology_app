@@ -164,6 +164,32 @@ export const useAstrologyForm = () => {
         console.warn("Failed to fetch dasha favourability:", dashaFavErr);
       }
 
+      // Three-track planet strength (bala / sambandha / adhikara) with the LLM
+      // judge's arbitration of the conflicts. Standalone endpoint; judge:true
+      // adds the verdicts (backend falls back to a deterministic verdict if the
+      // LLM is unavailable, so the packets always render).
+      let planetStrength = null;
+      try {
+        const strengthPayload = {
+          ...transformedData,
+          birth_date: formData.dateOfBirth,
+          judge: true,
+        };
+        const strengthResponse = await fetch(
+          `${API_BASE_URL}/api/planet-strength`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(strengthPayload),
+          }
+        );
+        if (strengthResponse.ok) {
+          planetStrength = await strengthResponse.json();
+        }
+      } catch (strengthErr) {
+        console.warn("Failed to fetch planet strength:", strengthErr);
+      }
+
       let dashaData = null;
       if (transformedData.moon && transformedData.moon.house && transformedData.moon.degree) {
         try {
@@ -197,7 +223,8 @@ export const useAstrologyForm = () => {
         ...backendData,
         ...(dashaData && { dasha: dashaData }),
         ...(predictions && { predictions }),
-        ...(dashaFavourability && { dashaFavourability })
+        ...(dashaFavourability && { dashaFavourability }),
+        ...(planetStrength && { planetStrength })
       };
       setResults(finalResults);
       

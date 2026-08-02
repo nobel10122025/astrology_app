@@ -4,6 +4,7 @@ import TableContent from '../table-content/index';
 import HeatMap from '../heat-map/index';
 import ProfessionPrediction from '../profession-prediction/index';
 import PredictionCards from '../prediction-cards/index';
+import PlanetStrength from '../planet-strength/index';
 import DashaCard from '../dasha-card/index';
 import DashaDisplay from '../dasha-display/index';
 import './ResultsDisplay.css';
@@ -216,6 +217,10 @@ const ResultsDisplay = ({
 
       {results.predictions && (
         <PredictionCards predictions={results.predictions} />
+      )}
+
+      {results.planetStrength && (
+        <PlanetStrength planetStrength={results.planetStrength} />
       )}
 
       {results.prediction && results.prediction.profession && (
