@@ -42,3 +42,33 @@ For production, use a WSGI server like Gunicorn:
 pip install gunicorn
 gunicorn -w 4 -b 0.0.0.0:5000 app:app
 ```
+
+### Configuration (environment variables)
+
+Copy `.env.example` to `.env` for local dev, or set these in your host's
+dashboard (e.g. Render) for deployment. See `.env.example` for the full list.
+
+Key variables:
+
+- `GROQ_API_KEY` — Groq key for the LLM judge, narrator and tool planner.
+- `LLM_PROVIDER` — `groq` (default), `anthropic`, or `ollama` for narration.
+
+#### Routing LLM calls through Portkey (optional)
+
+Set `PORTKEY_API_KEY` and every Groq call (judge, narrator, planner) is routed
+through the [Portkey](https://portkey.ai) AI gateway — no code change, no extra
+dependency — giving observability, caching, retries and fallbacks. Leave it
+unset to call Groq directly (the default). Choose one way for Portkey to reach
+Groq:
+
+- **Model catalog (recommended):** create an integration in the Portkey
+  dashboard, attach your Groq key to it, and set `PORTKEY_SLUG` to its slug
+  (e.g. `astrology-app-key`). The Groq key then lives in Portkey (drop
+  `GROQ_API_KEY`), and models are auto-addressed as `@<slug>/<model>`.
+- **Virtual key:** set `PORTKEY_VIRTUAL_KEY` (older header form; Portkey stores
+  the Groq key).
+- **Pass-through:** set `PORTKEY_PROVIDER=groq` (default) and `GROQ_API_KEY` is
+  forwarded to Groq.
+
+Optionally set `PORTKEY_CONFIG` to a saved Portkey config id for
+dashboard-defined routing/fallback/cache rules.

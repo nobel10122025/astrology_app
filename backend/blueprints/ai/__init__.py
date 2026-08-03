@@ -8,19 +8,26 @@ import os
 
 ai_bp = Blueprint('ai', __name__)
 
-# Initialize chat model
-chat = ChatPerplexity(
-    model="sonar-pro",
-    temperature=0.7,
-    pplx_api_key=os.environ.get('PPLX_API_KEY')
-)
+# Lazily build the Perplexity chain. Constructing it at import time crashes the
+# whole app when PPLX_API_KEY is unset - even though the LLM is only needed when
+# /ask is actually called. Build it on first use instead.
+_chain = None
 
-prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful assistant."),
-    ("human", "{question}")
-])
 
-chain = prompt | chat
+def _get_chain():
+    global _chain
+    if _chain is None:
+        chat = ChatPerplexity(
+            model="sonar-pro",
+            temperature=0.7,
+            pplx_api_key=os.environ.get('PPLX_API_KEY'),
+        )
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", "You are a helpful assistant."),
+            ("human", "{question}"),
+        ])
+        _chain = prompt | chat
+    return _chain
 
 def generate_profession_prediction(profession_data):
     """Generate profession prediction using AI based on planet and house connectivity"""
@@ -86,7 +93,7 @@ IMPORTANT: Return ONLY the JSON object, no markdown code blocks, no explanations
 """
     print("prompt_text", prompt_text)
     try:
-        response = chain.invoke({"question": prompt_text})
+        response = _get_chain().invoke({"question": prompt_text})
         content = response.content.strip()
         
         # Try to extract JSON from markdown code blocks if present
@@ -143,7 +150,7 @@ def ask():
         return jsonify({"error": "Missing 'question' in request"}), 400
     
     try:
-        response = chain.invoke({"question": question})
+        response = _get_chain().invoke({"question": question})
         return jsonify({
             "question": question,
             "answer": response.content

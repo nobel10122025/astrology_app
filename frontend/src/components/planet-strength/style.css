@@ -1,0 +1,270 @@
+.ps-section {
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 3px solid var(--theme-primary);
+}
+
+.ps-section-title {
+  text-align: center;
+  color: var(--theme-primary);
+  margin: 0 0 8px;
+}
+
+.ps-section-sub {
+  max-width: 760px;
+  margin: 0 auto 20px;
+  text-align: center;
+  line-height: 1.6;
+  color: var(--theme-primary);
+  opacity: 0.85;
+  font-size: 0.95rem;
+}
+
+.ps-context {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.ps-pill {
+  background: var(--theme-primary);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* --- tithi sheet --- */
+.ps-tithi {
+  max-width: 1000px;
+  margin: 0 auto 22px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border-left: 5px solid #999;
+  background: rgba(127, 127, 127, 0.08);
+}
+.ps-tithi-benefic { border-left-color: #2e9e5b; }
+.ps-tithi-average { border-left-color: #d6a419; }
+.ps-tithi-malefic,
+.ps-tithi-dark { border-left-color: #c0453b; }
+
+.ps-tithi-main {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ps-tithi-name { font-weight: 700; font-size: 1.05rem; }
+.ps-tithi-band { font-size: 0.85rem; opacity: 0.75; }
+.ps-tithi-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 0.82rem;
+  opacity: 0.8;
+  margin-top: 4px;
+}
+.ps-tithi-full { color: #2e9e5b; font-weight: 700; }
+.ps-tithi-desc { margin: 6px 0 0; font-size: 0.85rem; line-height: 1.5; opacity: 0.8; }
+
+/* --- grid + cards --- */
+.ps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.ps-card {
+  background: #fff;
+  color: #222;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ps-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.ps-card-title-wrap { display: flex; align-items: center; gap: 8px; }
+.ps-card-title { margin: 0; font-size: 1.3rem; font-weight: 700; }
+.ps-role {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: rgba(102, 126, 234, 0.15);
+  color: var(--theme-primary);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.ps-verdict {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  color: #fff;
+  white-space: nowrap;
+}
+.verdict-strong-good { background: #1f7a45; }
+.verdict-good { background: #2e9e5b; }
+.verdict-mixed { background: #d6a419; }
+.verdict-bad { background: #d1665c; }
+.verdict-strong-bad { background: #c0453b; }
+
+.ps-placement {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-size: 0.82rem;
+  color: #666;
+}
+
+/* --- track meters --- */
+.ps-tracks { display: flex; flex-direction: column; gap: 10px; }
+.ps-track-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.ps-track-score { font-variant-numeric: tabular-nums; }
+.ps-track-bar {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: #eceef5;
+  overflow: hidden;
+  margin: 3px 0;
+}
+.ps-track-fill { height: 100%; border-radius: 999px; }
+.trk-high { background: #2e9e5b; }
+.trk-mid { background: #d6a419; }
+.trk-low { background: #c0453b; }
+.trk-unknown { background: #999; }
+.ps-track-neutral {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.25);
+}
+.ps-track-hint { font-size: 0.74rem; color: #888; }
+
+.ps-reasoning {
+  margin: 4px 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #333;
+}
+
+.ps-dominant { font-size: 0.82rem; color: #555; }
+.ps-fallback { color: #b06a1a; }
+
+/* --- delivers / withholds --- */
+.ps-delivers { display: flex; flex-direction: column; gap: 6px; }
+.ps-delivers-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+.ps-side-good { color: #1f7a45; }
+.ps-side-bad { color: #c0453b; }
+.ps-chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.ps-chip {
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef0f6;
+  color: #333;
+}
+.ps-chip-good { background: rgba(46, 158, 91, 0.14); color: #1f7a45; }
+.ps-chip-bad { background: rgba(192, 69, 59, 0.14); color: #a2352c; }
+
+/* --- conflicts --- */
+.ps-conflicts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ps-conflicts li {
+  font-size: 0.84rem;
+  line-height: 1.5;
+  background: rgba(214, 164, 25, 0.1);
+  border-left: 3px solid #d6a419;
+  padding: 8px 10px;
+  border-radius: 0 8px 8px 0;
+  color: #444;
+}
+.ps-conflict-type {
+  display: block;
+  font-weight: 700;
+  color: #a67c10;
+  margin-bottom: 2px;
+}
+
+/* --- evidence --- */
+.ps-evidence-toggle {
+  align-self: flex-start;
+  background: none;
+  border: 1px solid var(--theme-primary);
+  color: var(--theme-primary);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.ps-evidence-toggle:hover { background: var(--theme-primary); color: #fff; }
+
+.ps-facts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.ps-fact {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: #f6f7fb;
+}
+.ps-fact-id {
+  font-family: monospace;
+  font-weight: 700;
+  color: #888;
+  flex-shrink: 0;
+}
+.ps-fact-benefic .ps-fact-id { color: #2e9e5b; }
+.ps-fact-malefic .ps-fact-id { color: #c0453b; }
+.ps-fact-note { flex: 1; color: #444; }
+.ps-fact-cited { background: rgba(102, 126, 234, 0.1); }
+.ps-fact-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--theme-primary);
+  flex-shrink: 0;
+}
+
+.ps-node-note {
+  font-size: 0.8rem;
+  color: #888;
+  font-style: italic;
+}
+
+/* dark theme: cards stay light for legibility of dense data, only the
+   surrounding chrome follows the theme. */
+@media (max-width: 600px) {
+  .ps-grid { grid-template-columns: 1fr; }
+}

@@ -1,10 +1,23 @@
+// ─────────────────────────────────────────────────────────────────────────
+// THEME CONFIG — single source of truth for the app's palette.
+// To re-skin the whole app, edit the `default` theme below (or swap in your
+// brand colours):
+//   primaryColor    = the accent (brass) — buttons, borders, chips, links
+//   secondaryColor  = the support hue (teal)
+//   bgGradient      = the page background
+//   headerBg        = the top header background
+// Every component reads these via var(--theme-primary/secondary/bg-gradient/
+// header-bg), so changing them here recolours everything. `data-theme` is also
+// set on <html> for future light/dark refinement.
+// ─────────────────────────────────────────────────────────────────────────
 export const themes = {
+  // Brass astrolabe on teal — the chosen identity.
   default: {
-    name: "Default",
-    bgGradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-    headerBg: "rgba(40, 44, 52, 0.9)",
-    primaryColor: "#667eea",
-    secondaryColor: "#764ba2",
+    name: "Brass & Teal",
+    bgGradient: "linear-gradient(135deg, #114d47 0%, #0c2f2c 100%)",
+    headerBg: "rgba(10, 38, 37, 0.92)",
+    primaryColor: "#8f6a1a",   // brass accent
+    secondaryColor: "#2a6f6a", // teal support
   },
   lightBlue: {
     name: "Light Blue",

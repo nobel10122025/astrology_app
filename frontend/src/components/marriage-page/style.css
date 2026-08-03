@@ -1,7 +1,7 @@
 .marriage-page {
   min-height: 100vh;
   padding: 20px;
-  background: var(--theme-bg-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+  background: var(--theme-bg-gradient, linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-secondary) 100%));
 }
 
 .marriage-header {
@@ -13,7 +13,7 @@
 }
 
 .back-button {
-  background: var(--theme-primary, #667eea);
+  background: var(--theme-primary);
   color: white;
   border: none;
   padding: 10px 20px;
@@ -25,7 +25,7 @@
 }
 
 .back-button:hover {
-  background: var(--theme-secondary, #764ba2);
+  background: var(--theme-secondary);
 }
 
 .page-title {
@@ -49,7 +49,7 @@
 }
 
 .marriage-section-title {
-  background: var(--theme-primary, #667eea);
+  background: var(--theme-primary);
   color: white;
   font-size: 16px;
   font-weight: 700;
@@ -143,7 +143,7 @@
 
 .marriage-breakdown {
   padding: 14px 20px 14px 36px;
-  border-left: 3px solid var(--theme-primary, #667eea);
+  border-left: 3px solid var(--theme-primary);
   margin: 8px 16px;
   border-radius: 0 6px 6px 0;
 }
@@ -172,7 +172,7 @@
 }
 
 .planet-tag {
-  background: var(--theme-primary, #667eea);
+  background: var(--theme-primary);
   color: white;
   padding: 2px 8px;
   border-radius: 12px;

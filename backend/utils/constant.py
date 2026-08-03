@@ -94,8 +94,8 @@ DRIK_BALAM_LOGIC = {
 # Detailed profession categories for planets based on Vedic astrology
 PLANET_PROFESSIONS = {
     'mars': [
+        'Medical Feilds'
         'Uniformed services',
-        'Medical fields',
         'Construction',
         'civil engineering',
         'Sports, fitness',
@@ -126,6 +126,7 @@ PLANET_PROFESSIONS = {
         'Communication-related jobs'
     ],
     'saturn': [
+        'Agriculture'
         'mechanical engineering',
         'philosophy',
         'crushing industries',

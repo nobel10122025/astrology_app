@@ -7,6 +7,38 @@ import { PLANET_SYMBOLS } from '../../utils/constants';
 
 import "./style.css";
 
+// The three display tracks the backend now returns per planet (a regrouping of
+// the score breakdown). Shown on planet cards instead of the single final_score.
+const TRACK_ORDER = [
+  { key: "subathuvam_papathuvam", label: "Subathuvam / Papathuvam" },
+  { key: "dig_sthana", label: "Dig / Sthana" },
+  { key: "kendra_kona", label: "Kendra / Kona" },
+];
+// Half-scale for the diverging track bars; a track rarely exceeds ±6.
+const TRACK_MAX = 6;
+
+const TrackMeter = ({ label, value }) => {
+  const v = Math.max(-TRACK_MAX, Math.min(TRACK_MAX, value || 0));
+  const half = (Math.abs(v) / TRACK_MAX) * 50;
+  const left = v >= 0 ? 50 : 50 - half;
+  const cls = value > 0 ? "pos" : value < 0 ? "neg" : "zero";
+  return (
+    <div className="ptrack-row">
+      <span className="ptrack-label">{label}</span>
+      <div className="ptrack-bar">
+        <span className="ptrack-center" />
+        <span
+          className={`ptrack-fill ${cls}`}
+          style={{ left: `${left}%`, width: `${half}%` }}
+        />
+      </div>
+      <span className={`ptrack-val ${cls}`}>
+        {value > 0 ? `+${value}` : value}
+      </span>
+    </div>
+  );
+};
+
 const CardContent = ({ results, expandItem, toggle, is_planet_card }) => {
   return (
     <div className="planet-cards-grid">
@@ -40,7 +72,7 @@ const CardContent = ({ results, expandItem, toggle, is_planet_card }) => {
           >
             <div className="card-header">
               <div className="planet-info">
-                <span className="planet-symbol">🏠</span>
+                {!is_planet_card && <span className="planet-symbol">🏠</span>}
                 <span className="planet-name">
                   {" "}
                   {is_planet_card ? "Planet" : "House"}{" "}
@@ -50,23 +82,29 @@ const CardContent = ({ results, expandItem, toggle, is_planet_card }) => {
                   {emoji}
                 </span>
               </div>
-              <div
-                className="score-badge"
-                style={{ backgroundColor: scoreColor }}
-              >
-                {score.toFixed(2)}
-              </div>
+              {/* final_score is kept internally but shown only for houses;
+                  planet cards display the 3 tracks below instead. */}
+              {!is_planet_card && (
+                <div
+                  className="score-badge"
+                  style={{ backgroundColor: scoreColor }}
+                >
+                  {score.toFixed(2)}
+                </div>
+              )}
             </div>
 
-            <div className="progress-container">
-              <div
-                className="progress-bar"
-                style={{
-                  width: `${normalizedScore}%`,
-                  backgroundColor: scoreColor,
-                }}
-              />
-            </div>
+            {!is_planet_card && (
+              <div className="progress-container">
+                <div
+                  className="progress-bar"
+                  style={{
+                    width: `${normalizedScore}%`,
+                    backgroundColor: scoreColor,
+                  }}
+                />
+              </div>
+            )}
             {!is_planet_card && (
               <div className="planet-quick-info">
                 <div className="info-item">
@@ -91,6 +129,26 @@ const CardContent = ({ results, expandItem, toggle, is_planet_card }) => {
                   <span className="info-label">House:</span>
                   <span className="info-value">{item.house}</span>
                 </div>
+              </div>
+            )}
+
+            {is_planet_card && item.tracks && (
+              <div className="planet-tracks">
+                {TRACK_ORDER.map((t) => (
+                  <TrackMeter
+                    key={t.key}
+                    label={t.label}
+                    value={getValue(item.tracks[t.key])}
+                  />
+                ))}
+                {item.mutual_exchange?.active && (
+                  <div
+                    className="mutual-exchange-badge"
+                    title={item.mutual_exchange.reason}
+                  >
+                    🔄 {item.mutual_exchange.reason || "Mutual exchange"}
+                  </div>
+                )}
               </div>
             )}
 

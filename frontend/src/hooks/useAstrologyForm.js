@@ -119,6 +119,81 @@ export const useAstrologyForm = () => {
         throw new Error(backendData.error || "Failed to calculate");
       }
 
+      // --- Career / Life Predictions temporarily disabled ------------------
+      // (Was: age-aware life predictions from /api/predict with narrate:true.)
+      // The /api/predict call (and its LLM/Portkey usage) is turned off for
+      // now. `predictions` stays null so the results spread omits it. To
+      // re-enable, uncomment the block below and restore `let`.
+      const predictions = null;
+      // try {
+      //   const predictPayload = {
+      //     ...transformedData,
+      //     birth_date: formData.dateOfBirth,
+      //     name: formData.name,
+      //     narrate: true,
+      //   };
+      //   const predictResponse = await fetch(`${API_BASE_URL}/api/predict`, {
+      //     method: "POST",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify(predictPayload),
+      //   });
+      //   if (predictResponse.ok) {
+      //     predictions = await predictResponse.json();
+      //   }
+      // } catch (predictErr) {
+      //   console.warn("Failed to fetch predictions:", predictErr);
+      // }
+
+      // Dasa-Bhukti favourability verdict (the 12-rule sub-agent) for the
+      // current period, plus its narration. Narrator provider is controlled by
+      // the backend (LLM_PROVIDER env), so this works with Groq or local Ollama.
+      let dashaFavourability = null;
+      try {
+        const dashaFavPayload = {
+          ...transformedData,
+          birth_date: formData.dateOfBirth,
+          name: formData.name,
+          narrate: true,
+        };
+        const dashaFavResponse = await fetch(`${API_BASE_URL}/api/dasha`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dashaFavPayload),
+        });
+        if (dashaFavResponse.ok) {
+          dashaFavourability = await dashaFavResponse.json();
+        }
+      } catch (dashaFavErr) {
+        console.warn("Failed to fetch dasha favourability:", dashaFavErr);
+      }
+
+      // --- Planet-strength (three-track) temporarily disabled --------------
+      // The /api/planet-strength call (and its LLM/Portkey usage) is turned off
+      // while the scoring is being made accurate for release. `planetStrength`
+      // stays null so the results spread omits it. To re-enable, uncomment the
+      // block below and restore `let`.
+      const planetStrength = null;
+      // try {
+      //   const strengthPayload = {
+      //     ...transformedData,
+      //     birth_date: formData.dateOfBirth,
+      //     judge: true,
+      //   };
+      //   const strengthResponse = await fetch(
+      //     `${API_BASE_URL}/api/planet-strength`,
+      //     {
+      //       method: "POST",
+      //       headers: { "Content-Type": "application/json" },
+      //       body: JSON.stringify(strengthPayload),
+      //     }
+      //   );
+      //   if (strengthResponse.ok) {
+      //     planetStrength = await strengthResponse.json();
+      //   }
+      // } catch (strengthErr) {
+      //   console.warn("Failed to fetch planet strength:", strengthErr);
+      // }
+
       let dashaData = null;
       if (transformedData.moon && transformedData.moon.house && transformedData.moon.degree) {
         try {
@@ -153,7 +228,10 @@ export const useAstrologyForm = () => {
 
       const finalResults = {
         ...backendData,
-        ...(dashaData && { dasha: dashaData })
+        ...(dashaData && { dasha: dashaData }),
+        ...(predictions && { predictions }),
+        ...(dashaFavourability && { dashaFavourability }),
+        ...(planetStrength && { planetStrength })
       };
       setResults(finalResults);
       
