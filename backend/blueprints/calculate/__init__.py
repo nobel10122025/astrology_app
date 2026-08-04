@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from calculations import calculate_subathuva_pabathuvam, calculate_house_subathuva_pabathuvam, calculate_professions, calculate_dasha_antardasha, calculate_all_dashas_120_years
 from chart_generator import generate_south_indian_chart
 from utils.constant import RASI_TO_DEGREE, PLANET_OWN_HOUSES
+from core.point_scoring import score_chart
 
 calculate_bp = Blueprint('calculate', __name__, url_prefix='/api')
 
@@ -62,6 +63,11 @@ def calculate():
                     'house': result['house']
                 }
         
+        # Point-scale planet strength (new two-track model). Reads the SAME
+        # positions dict {degree(abs), rasi, house}; runs alongside the legacy
+        # final_score, which is left untouched for all downstream consumers.
+        point_scores = score_chart(positions)
+
         # Calculate house Subathuva/Pabathuvam
         house_results = calculate_house_subathuva_pabathuvam(data, results, positions)
         
@@ -90,55 +96,19 @@ def calculate():
             drik_balam_val, drik_balam_reason = get_value_reason('drik_balam')
             planetery_exchange_val, planetery_exchange_reason = get_value_reason('planetery_exchange')
 
-            # --- Three display tracks (planets only) -------------------------
-            # Pure regrouping of the components above into the user's 3 tracks.
-            # base 5 + track1 + track2 + track3 + mutual_exchange == final_score,
-            # so final_score stays valid and everything downstream (chart_context,
-            # houses, marriage, dasha, planet-strength) is unaffected. Mutual
-            # exchange is a highlighted badge, not a track; its points remain in
-            # final_score.
-            tracks = {
-                'subathuvam_papathuvam': {
-                    'label': 'Subathuvam / Papathuvam',
-                    'value': round(suba_val + paba_val + combust_val, 2),
-                    'components': {
-                        'subathuva': {'value': suba_val, 'reason': suba_reason},
-                        'pabathuvam': {'value': paba_val, 'reason': paba_reason},
-                        'combust': {'value': combust_val, 'reason': combust_reason},
-                    },
-                },
-                'dig_sthana': {
-                    'label': 'Dig / Sthana Balam',
-                    'value': round(drik_balam_val + pos_val + exalt_val + exalt_debil_val, 2),
-                    'components': {
-                        'drik_balam': {'value': drik_balam_val, 'reason': drik_balam_reason},
-                        'position': {'value': pos_val, 'reason': pos_reason},
-                        'exaltation_debilitation': {'value': exalt_val, 'reason': exalt_reason},
-                        'exalt_debil_conjunction': {'value': exalt_debil_val, 'reason': exalt_debil_reason},
-                    },
-                },
-                'kendra_kona': {
-                    'label': 'Kendra / Kona Balam',
-                    'value': round(special_val + friend_val, 2),
-                    'components': {
-                        'special_houses': {'value': special_val, 'reason': special_reason},
-                        'friendship': {'value': friend_val, 'reason': friend_reason},
-                    },
-                },
-            }
-            mutual_exchange = {
-                'active': bool(planetery_exchange_val),
-                'value': planetery_exchange_val,
-                'reason': planetery_exchange_reason,
-            }
+            # --- Two display tracks (planets only), from the point engine ----
+            # Track 1 (subathuvam_papathuvam): net signed contact balance.
+            # Track 2 (dig_sthana): placement strength 0-200 + dignity tier.
+            # The legacy final_score below is left intact for all downstream
+            # consumers (chart_context, houses, marriage, dasha, predictions).
+            point_tracks = point_scores.get(planet, {}).get('tracks', {})
 
             table_data.append({
                 'planet': planet.upper(),
                 'absolute_degree': result['absolute_degree'],
                 'rasi': result['rasi'],
                 'house': result['house'],
-                'tracks': tracks,
-                'mutual_exchange': mutual_exchange,
+                'tracks': point_tracks,
                 'base': {'value': base_val, 'reason': base_reason},
                 'subathuva': {'value': suba_val, 'reason': suba_reason},
                 'pabathuvam': {'value': paba_val, 'reason': paba_reason},

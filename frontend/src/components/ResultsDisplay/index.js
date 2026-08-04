@@ -91,9 +91,16 @@ const ResultsDisplay = ({
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
           >
-            <option value="current">Current Order</option>
-            <option value="score-low-high">Score (Low to High)</option>
+            <option value="both-first">Both effects first</option>
+            <option value="subathuvam-high-low">Subathuvam (High to Low)</option>
+            <option value="subathuvam-low-high">Subathuvam (Low to High)</option>
+            <option value="papathuvam-high-low">Papathuvam (High to Low)</option>
+            <option value="papathuvam-low-high">Papathuvam (Low to High)</option>
+            <option value="sthana-high-low">Sthana (High to Low)</option>
+            <option value="sthana-low-high">Sthana (Low to High)</option>
             <option value="score-high-low">Score (High to Low)</option>
+            <option value="score-low-high">Score (Low to High)</option>
+            <option value="current">Current Order</option>
           </select>
         </div>
 

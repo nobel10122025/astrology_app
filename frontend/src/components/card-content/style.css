@@ -115,92 +115,153 @@
     color: #333;
 }
 
-/* --- Planet three-track display (replaces final_score on planet cards) --- */
+/* --- Planet two-track display (replaces final_score on planet cards) --- */
 .planet-tracks {
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid var(--line);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
 }
 
-.ptrack-row {
+.track-name {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+}
+
+/* Track 2: Sthana / Dig -> labelled chip -------------------------------- */
+.track-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.dignity-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px 4px 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 700;
+    border: 1px solid transparent;
+}
+
+.dignity-tier {
+    white-space: nowrap;
+}
+
+.dignity-val {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.55);
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+}
+
+/* dignity tiers */
+.dignity-chip.dig-great { background: #e5f4ec; color: #1f7a45; border-color: #bfe6cf; }
+.dignity-chip.dig-good  { background: #eef5e6; color: #4a7a1f; border-color: #d6e8bf; }
+.dignity-chip.dig-mid   { background: #f1ece0; color: #7a6320; border-color: var(--line-strong); }
+.dignity-chip.dig-bad   { background: #fdecea; color: #b02a37; border-color: #f2c9c4; }
+.dignity-chip.dig-none  { background: #f1ece0; color: var(--ink-faint); border-color: var(--line); }
+
+/* Track 1: Subathuvam / Papathuvam -> two split values + diverging bar --- */
+.track-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.suba-papa-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.suba-papa-vals {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-variant-numeric: tabular-nums;
+}
+
+.suba-papa-vals .diverge-val {
+    font-size: 13px;
+}
+
+.section-total .pos { color: var(--benefic); }
+.section-total .neg { color: var(--malefic); }
+
+.diverge-row {
     display: grid;
-    grid-template-columns: 1fr 90px 42px;
+    grid-template-columns: 1fr 46px;
     align-items: center;
     gap: 10px;
 }
 
-.ptrack-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: #444;
-}
-
-.ptrack-bar {
+.diverge-bar {
     position: relative;
-    height: 8px;
+    height: 10px;
     border-radius: 999px;
-    background: #eceef5;
+    background: #ece4d4;
     overflow: hidden;
 }
 
-.ptrack-center {
+.diverge-center {
     position: absolute;
     left: 50%;
     top: 0;
     width: 2px;
     height: 100%;
-    background: rgba(0, 0, 0, 0.28);
+    background: rgba(0, 0, 0, 0.3);
     z-index: 1;
 }
 
-.ptrack-fill {
+.diverge-fill {
     position: absolute;
     top: 0;
     height: 100%;
 }
 
-.ptrack-fill.pos {
-    background: #28a745;
+.diverge-fill.pos {
+    background: var(--benefic);
     border-radius: 0 999px 999px 0;
 }
 
-.ptrack-fill.neg {
-    background: #dc3545;
+.diverge-fill.neg {
+    background: var(--malefic);
     border-radius: 999px 0 0 999px;
 }
 
-.ptrack-val {
+.diverge-val {
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 800;
     text-align: right;
     font-variant-numeric: tabular-nums;
 }
 
-.ptrack-val.pos {
-    color: #1f7a45;
-}
+.diverge-val.pos { color: var(--benefic); }
+.diverge-val.neg { color: var(--malefic); }
+.diverge-val.zero { color: var(--ink-faint); }
 
-.ptrack-val.neg {
-    color: #b02a37;
-}
-
-.ptrack-val.zero,
-.ptrack-label + .ptrack-bar + .ptrack-val.zero {
-    color: #999;
-}
-
-.mutual-exchange-badge {
-    margin-top: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--theme-secondary);
-    background: color-mix(in srgb, var(--theme-secondary) 14%, transparent);
-    border-radius: 8px;
-    padding: 6px 10px;
-    line-height: 1.35;
+/* section total shown next to expanded-view headings */
+.section-total {
+    float: right;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-soft);
 }
 
 .expand-indicator {
