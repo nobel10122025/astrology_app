@@ -175,6 +175,20 @@ POINTS = {
     # Full-Moon plateau: tithis 13/14/15 all score the max 100 (mode B). Set to
     # False for the smooth tent (13->85, 14->92.5, 15->100).
     "full_moon_plateau": True,
+
+    # --- Collapse the two tracks into ONE 0-10 planet strength ------------
+    # Needed only by the prediction engines (dasha favourability, profession)
+    # that consume a single number. Placement (Sthana/Dig, 0-200) sets the
+    # base; the net contact balance (subathuvam+papathuvam) nudges it up/down.
+    # This maps back onto the SAME 0-10 / -5..15 scale the old final_score used,
+    # so the existing thresholds stay valid -> predictions re-base without a
+    # rule rewrite. >>> REVIEW  weights/spans are sensible defaults; tune here.
+    "strength_map": {
+        "sthana_full":      200.0,   # sthana that reads as full placement
+        "contact_full":     200.0,   # net contacts that read as a full +/- swing
+        "placement_weight": 0.6,     # how much Sthana/Dig drives the number
+        "contact_weight":   0.4,     # how much the net contact balance drives it
+    },
 }
 
 # The luminaries/nodes that do not participate as generic afflicter contacts.
@@ -553,6 +567,34 @@ def score_planet(chart, planet):
 def score_chart(chart):
     """Score every planet present in `chart`."""
     return {p: score_planet(chart, p) for p in PLANETS if p in chart}
+
+
+# --- single-number collapse (for the prediction engines) ------------------
+def _clamp01(x):
+    return max(0.0, min(1.0, x))
+
+
+def contact_net(result):
+    """Net contact balance (subathuvam + papathuvam) for a scored planet."""
+    t1 = result["tracks"]["subathuvam_papathuvam"]
+    return round(t1.get("subathuvam", 0) + t1.get("papathuvam", 0), 1)
+
+
+def planet_strength_0_10(result):
+    """Collapse a scored planet's two tracks into one 0-10 strength."""
+    m = POINTS["strength_map"]
+    sthana = result["tracks"]["dig_sthana"]["value"]
+    net = contact_net(result)
+    placement = _clamp01(sthana / m["sthana_full"])              # 0..1
+    contact = _clamp01(0.5 + net / (2.0 * m["contact_full"]))    # 0..1 (0.5 = neutral)
+    s01 = m["placement_weight"] * placement + m["contact_weight"] * contact
+    return round(s01 * 10.0, 2)
+
+
+def planet_strength_legacy(result):
+    """The 0-10 strength mapped onto the legacy -5..15 scale, so old thresholds
+    (final_score > 5, ChartQuery.strength, etc.) keep working unchanged."""
+    return round(planet_strength_0_10(result) * 2.0 - 5.0, 2)
 
 
 # --------------------------------------------------------------------------

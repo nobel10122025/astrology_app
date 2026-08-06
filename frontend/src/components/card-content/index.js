@@ -27,7 +27,8 @@ const DIGNITY_CLASS = {
 const prettyDignity = (d) =>
   (d || "none").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
-// Track 2: placement strength as a labelled chip (not a bar).
+// Track 2 (planets only): placement strength as a labelled chip (not a bar).
+// Houses have no Sthana track, so this renders nothing for them.
 const DignityChip = ({ track }) => {
   if (!track) return null;
   const cls = DIGNITY_CLASS[track.dignity] || "dig-none";
@@ -121,7 +122,9 @@ const CardContent = ({ results, expandItem, toggle, is_planet_card }) => {
         const isExpanded = expandItem.has(
           is_planet_card ? item.planet : item.house
         );
-        const score = getValue(item.final_score);
+        // Houses now carry the point-scale strength (mapped onto -5..15); fall
+        // back to the legacy final_score if it is missing.
+        const score = getValue(item.strength_score ?? item.final_score);
         const normalizedScore = ((score + 5) / 20) * 100;
         const scoreColor = getScoreColor(score);
 
@@ -207,7 +210,7 @@ const CardContent = ({ results, expandItem, toggle, is_planet_card }) => {
               </div>
             )}
 
-            {is_planet_card && item.tracks && (
+            {item.tracks && (
               <div className="planet-tracks">
                 <DignityChip track={item.tracks.dig_sthana} />
                 <SubaPapaBar track={item.tracks.subathuvam_papathuvam} />
@@ -216,7 +219,7 @@ const CardContent = ({ results, expandItem, toggle, is_planet_card }) => {
 
             {isExpanded && (
               <div className="card-details">
-                {is_planet_card ? (
+                {item.tracks ? (
                   <>
                     <FactSection
                       title="Subathuvam / Papathuvam"

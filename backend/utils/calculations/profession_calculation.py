@@ -64,13 +64,16 @@ def calculate_professions(data, planet_results, positions, house_results):
     moon_2nd_house = ((moon_house + 1) % 12) or 12 if moon_house else None
     moon_10th_house = ((moon_house + 9) % 12) or 12 if moon_house else None
     
-    # Step 1: Get first two subathuva planets (sorted by final_score descending)
+    # Step 1: Get first two subathuva planets (sorted by strength descending).
+    # `strength_score` is the point-scale model mapped onto the legacy -5..15
+    # scale (injected upstream); fall back to final_score if it is absent.
     subathuva_planets = []
     for planet_name, result in planet_results.items():
-        if result['final_score'] > 5:  # Subathuva planets have score > 5
+        planet_score = result.get('strength_score', result['final_score'])
+        if planet_score > 5:  # Subathuva planets have score > 5
             subathuva_planets.append({
                 'planet': planet_name,
-                'score': result['final_score'],
+                'score': planet_score,
                 'house': result['house']
             })
     
@@ -166,7 +169,7 @@ def calculate_professions(data, planet_results, positions, house_results):
             if result['house'] == moon_2nd_house or result['house'] == moon_10th_house:
                 moon_related_planets.append({
                     'planet': planet_name,
-                    'score': result['final_score'],
+                    'score': result.get('strength_score', result['final_score']),
                     'house': result['house'],
                     'from_moon': '2nd' if result['house'] == moon_2nd_house else '10th'
                 })
@@ -176,11 +179,12 @@ def calculate_professions(data, planet_results, positions, house_results):
     for house_num in [2, 10, 11]:
         if house_num in house_results:
             house_result = house_results[house_num]
-            if house_result['final_score'] >= 6:  # Subathuva house
+            house_score = house_result.get('strength_score', house_result['final_score'])
+            if house_score >= 6:  # Subathuva house
                 house_lord = get_house_lord(house_num, ascendant_rasi)
                 subathuva_houses.append({
                     'house': house_num,
-                    'score': house_result['final_score'],
+                    'score': house_score,
                     'lord': house_lord
                 })
     

@@ -2,7 +2,8 @@ from flask import Blueprint, jsonify, request
 from calculations import calculate_subathuva_pabathuvam, calculate_house_subathuva_pabathuvam, calculate_professions, calculate_dasha_antardasha, calculate_all_dashas_120_years
 from chart_generator import generate_south_indian_chart
 from utils.constant import RASI_TO_DEGREE, PLANET_OWN_HOUSES
-from core.point_scoring import score_chart
+from core.point_scoring import score_chart, planet_strength_legacy, contact_net
+from core.house_point_scoring import score_houses, house_strength_legacy
 
 calculate_bp = Blueprint('calculate', __name__, url_prefix='/api')
 
@@ -68,6 +69,13 @@ def calculate():
         # final_score, which is left untouched for all downstream consumers.
         point_scores = score_chart(positions)
 
+        # Collapse the two tracks into one strength on the legacy -5..15 scale
+        # and attach it to each planet result, so profession (and any other
+        # legacy-scale consumer) re-bases on the new model without re-tuning.
+        for planet, ps in point_scores.items():
+            if planet in results:
+                results[planet]['strength_score'] = planet_strength_legacy(ps)
+
         # Calculate house Subathuva/Pabathuvam
         house_results = calculate_house_subathuva_pabathuvam(data, results, positions)
         
@@ -101,7 +109,10 @@ def calculate():
             # Track 2 (dig_sthana): placement strength 0-200 + dignity tier.
             # The legacy final_score below is left intact for all downstream
             # consumers (chart_context, houses, marriage, dasha, predictions).
-            point_tracks = point_scores.get(planet, {}).get('tracks', {})
+            point_result = point_scores.get(planet, {})
+            point_tracks = point_result.get('tracks', {})
+            t1 = point_tracks.get('subathuvam_papathuvam', {})
+            t2 = point_tracks.get('dig_sthana', {})
 
             table_data.append({
                 'planet': planet.upper(),
@@ -109,6 +120,12 @@ def calculate():
                 'rasi': result['rasi'],
                 'house': result['house'],
                 'tracks': point_tracks,
+                # top-level point-scale values (for Heat Map / Table columns)
+                'subathuvam': t1.get('subathuvam', 0),
+                'papathuvam': t1.get('papathuvam', 0),
+                'sthana': t2.get('value', 0),
+                'net_contact': contact_net(point_result) if point_result else 0,
+                'strength_score': results[planet].get('strength_score', result['final_score']),
                 'base': {'value': base_val, 'reason': base_reason},
                 'subathuva': {'value': suba_val, 'reason': suba_reason},
                 'pabathuvam': {'value': paba_val, 'reason': paba_reason},
@@ -146,6 +163,14 @@ def calculate():
                             owned_houses.append(house_num)
                 planet_owned_houses[planet] = owned_houses
         
+        # Point-scale house strength (two-track model, lord + contacts). Collapse
+        # onto the legacy -5..15 scale and attach to each house_result so
+        # profession (and any legacy-scale consumer) re-bases on the new model.
+        house_point = score_houses(positions, ascendant_rasi)
+        for house_num, hp in house_point.items():
+            if house_num in house_results:
+                house_results[house_num]['strength_score'] = house_strength_legacy(hp)
+
         # Format house results as table
         house_table_data = []
         for house_num in range(1, 13):
@@ -177,9 +202,19 @@ def calculate():
                         'owned_houses': owned_houses
                     })
                 
+                hp = house_point.get(house_num, {})
+                h_tracks = hp.get('tracks', {})
+                ht1 = h_tracks.get('subathuvam_papathuvam', {})
+
                 house_table_data.append({
                     'house': house_num,
                     'rasi': house_result['rasi'],
+                    'tracks': h_tracks,
+                    # top-level point-scale values (for Heat Map / Table columns)
+                    'subathuvam': ht1.get('subathuvam', 0),
+                    'papathuvam': ht1.get('papathuvam', 0),
+                    'net_contact': ht1.get('value', 0),
+                    'strength_score': house_results[house_num].get('strength_score', house_result['final_score']),
                     'base': {'value': base_val, 'reason': base_reason},
                     'subathuva': {'value': suba_val, 'reason': suba_reason},
                     'pabathuvam': {'value': paba_val, 'reason': paba_reason},
@@ -349,9 +384,11 @@ def calculate():
             'marriage': marriage,
             'summary': {
                 'total_planets': len(table_data),
-                'average_score': round(sum(r['final_score'] for r in table_data) / len(table_data), 2) if table_data else 0,
+                # average planet strength on the new point-scale (-5..15 mapped)
+                'average_score': round(sum(r['strength_score'] for r in table_data) / len(table_data), 2) if table_data else 0,
                 'total_houses': len(house_table_data),
-                'average_house_score': round(sum(r['final_score'] for r in house_table_data) / len(house_table_data), 2) if house_table_data else 0
+                # average house strength on the new point-scale (-5..15 mapped)
+                'average_house_score': round(sum(r['strength_score'] for r in house_table_data) / len(house_table_data), 2) if house_table_data else 0
             }
         }
         

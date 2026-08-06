@@ -10,11 +10,12 @@ const TableContent = ({ results, is_planet_table }) => {
     const tableHeaders = is_planet_table ? planetTableHeaders : houseTableHeaders;
 
     const getClassName = (row, header) => {
-        const { positive, negative, key } = header;
+        const { positive, negative, key, threshold = 5 } = header;
         if (positive && negative) {
-            if (row[key] > 5) {
+            const v = getValue(row[key]);
+            if (v > threshold) {
                 return "positive";
-            } else if (row[key] < 5) {
+            } else if (v < threshold) {
                 return "negative";
             }
         } else if (positive) {

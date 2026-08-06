@@ -16,7 +16,9 @@ const ScoreItem = ({ label, data, isHouse }) => {
     );
   }
 
-  const score = data.final_score;
+  // Planets use the new point-scale strength (mapped onto -5..15); houses fall
+  // back to the legacy final_score (no house point-model).
+  const score = data.strength_score ?? data.final_score;
   const name = isHouse
     ? `House ${data.house} (${capitalizeFirstLetter(data.rasi)})`
     : `${capitalizeFirstLetter(data.planet?.toLowerCase())} — ${capitalizeFirstLetter(data.rasi)} (House ${data.house})`;

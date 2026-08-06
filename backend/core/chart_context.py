@@ -19,6 +19,8 @@ from utils.calculations.planet_calulation import calculate_subathuva_pabathuvam
 from utils.calculations.profession_calculation import get_house_lord
 from utils.calculations.utils import rasi_to_absolute_degree
 from utils.constant import PLANETS
+from core.point_scoring import score_chart, planet_strength_legacy
+from core.house_point_scoring import score_houses, house_strength_legacy
 
 
 @dataclass(frozen=True)
@@ -63,8 +65,21 @@ def build_chart_context(data, birth_date_str=None):
 
     house_results = calculate_house_subathuva_pabathuvam(data, results, positions)
 
-    scores = {p: results[p]["final_score"] for p in results}
-    house_scores = {h: house_results[h]["final_score"] for h in house_results}
+    # Planet + house strength now come from the point-scale model (two tracks
+    # collapsed onto the legacy -5..15 scale, so every downstream threshold
+    # stays valid). Houses derive their strength from their lord + contacts.
+    point_scores = score_chart(positions)
+    house_point = score_houses(positions, ascendant_rasi)
+    scores = {
+        p: (planet_strength_legacy(point_scores[p]) if p in point_scores
+            else results[p]["final_score"])
+        for p in results
+    }
+    house_scores = {
+        h: (house_strength_legacy(house_point[h]) if h in house_point
+            else house_results[h]["final_score"])
+        for h in house_results
+    }
     planet_houses = {p: results[p]["house"] for p in results}
     chart = {
         p: {
