@@ -225,8 +225,18 @@ def calculate():
                     'planets_list': planets_list
                 })
         
-        # Generate South Indian style chart HTML
-        chart_html = generate_south_indian_chart(data, results)
+        # Generate South Indian style chart HTML, tinted by the point-scale
+        # house model (Subathuvam/Papathuvam net per house).
+        chart_house_strengths = {
+            r['house']: {
+                'net': r['net_contact'],
+                'strength': r['strength_score'],
+                'subathuvam': r['subathuvam'],
+                'papathuvam': r['papathuvam'],
+            }
+            for r in house_table_data
+        }
+        chart_html = generate_south_indian_chart(data, results, chart_house_strengths)
         
         
         # Calculate professions data
