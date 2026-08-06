@@ -17,7 +17,9 @@ const ScoreRow = ({ label, data, isHouse }) => {
     );
   }
 
-  const score = data.final_score;
+  // Planets carry the new point-scale strength (mapped onto -5..15); houses
+  // have no point-model so they fall back to the legacy final_score.
+  const score = data.strength_score ?? data.final_score;
   const detail = isHouse
     ? `House ${data.house} (${capitalizeFirstLetter(data.rasi)})`
     : data.planet
