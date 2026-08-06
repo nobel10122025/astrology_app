@@ -44,11 +44,16 @@ PLANET_NAMES = {
 }
 
 
-def generate_south_indian_chart(data, results):
+def generate_south_indian_chart(data, results, house_strengths=None):
     """
     Generate South Indian style Rasi chart HTML
     Layout: South Indian style with house 1 at bottom-left
+
+    house_strengths: optional {user_house_num: {'net','strength','subathuvam',
+    'papathuvam'}} from the point-scale house model. When given, each house cell
+    is tinted benefic/malefic by its net contact and shows a small net badge.
     """
+    house_strengths = house_strengths or {}
     # Get all positions
     positions = {}
     ascendant_rasi = data.get('ascendant', {}).get('house', '')
@@ -151,91 +156,126 @@ def generate_south_indian_chart(data, results):
             'rasi': pos['rasi']
         })
     
-    # Generate HTML
+    # Generate HTML. Colours pull from the app's theme CSS variables (which
+    # cascade into this injected markup) with sensible fallbacks.
     html = """
     <div class="rasi-chart-container">
         <style>
+            .rasi-chart-container {
+                --chart-pos: var(--benefic, #2e7d51);
+                --chart-neg: var(--malefic, #c0492f);
+                --chart-surface: var(--surface, #ffffff);
+                --chart-ink: var(--ink, #23201c);
+                --chart-faint: var(--ink-faint, #8a8178);
+                --chart-line: var(--line, #e4dccb);
+                --chart-accent: var(--theme-primary, #b08637);
+            }
             .rasi-chart {
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
                 grid-template-rows: repeat(4, 1fr);
-                gap: 2px;
-                max-width: 600px;
+                gap: 6px;
+                max-width: 620px;
                 margin: 20px auto;
-                border: 3px solid #000;
-                background: #000;
+                padding: 6px;
+                border-radius: 16px;
+                background: var(--chart-line);
+                box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
             }
             .chart-cell {
-                background: white;
-                border: 2px solid #000;
-                padding: 12px;
-                min-height: 120px;
+                background: var(--chart-surface);
+                color: var(--chart-ink);
+                border: 1px solid var(--chart-line);
+                border-radius: 10px;
+                padding: 10px;
+                min-height: 118px;
                 position: relative;
                 display: flex;
                 flex-direction: column;
+                transition: transform 0.15s ease, box-shadow 0.15s ease;
             }
-            .chart-cell.empty {
-                background: white;
-                grid-column: span 1;
-                grid-row: span 1;
+            .chart-cell:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+                z-index: 2;
             }
             .chart-cell.central-empty {
                 grid-column: 2 / 4;
                 grid-row: 2 / 4;
-                background: white;
-                border: 2px solid #000;
+                background: transparent;
+                border: none;
+                box-shadow: none;
+                align-items: center;
+                justify-content: center;
             }
+            .chart-cell.central-empty:hover { transform: none; box-shadow: none; }
             .chart-cell.user-ascendant {
-                background: #fff9e6;
-                border: 3px solid #ff6b6b;
-                font-weight: bold;
+                outline: 2px solid var(--chart-accent);
+                outline-offset: -2px;
             }
-            # .chart-cell.user-ascendant .house-number::after {
-            #     content: " (Your Ascendant)";
-            #     color: #ff6b6b;
-            #     font-size: 10px;
-            # }
+            .cell-head {
+                display: flex;
+                align-items: baseline;
+                justify-content: space-between;
+                gap: 6px;
+                margin-bottom: 2px;
+            }
             .house-number {
-                font-weight: bold;
-                font-size: 12px;
-                color: #666;
-                margin-bottom: 4px;
+                font-weight: 700;
+                font-size: 11px;
+                letter-spacing: 0.03em;
+                color: var(--chart-faint);
             }
+            .house-net {
+                font-size: 11px;
+                font-weight: 800;
+                font-variant-numeric: tabular-nums;
+            }
+            .house-net.pos { color: var(--chart-pos); }
+            .house-net.neg { color: var(--chart-neg); }
+            .house-net.zero { color: var(--chart-faint); }
             .rasi-name {
-                font-weight: bold;
-                font-size: 14px;
-                color: #333;
+                font-weight: 700;
+                font-size: 13px;
+                color: var(--chart-ink);
                 margin-bottom: 6px;
-                text-align: center;
             }
             .planet-list {
                 flex: 1;
                 display: flex;
                 flex-direction: column;
-                gap: 4px;
+                gap: 3px;
             }
             .planet-item {
-                font-size: 13px;
+                font-size: 12.5px;
                 display: flex;
                 align-items: center;
                 gap: 5px;
             }
-            .planet-symbol {
-                font-size: 18px;
-            }
             .planet-degree {
-                color: #666;
-                font-size: 11px;
+                color: var(--chart-faint);
+                font-size: 10.5px;
             }
+            .chart-asc-planet { color: var(--chart-accent); font-weight: 700; }
             .chart-title {
                 text-align: center;
+                font-family: var(--font-display, inherit);
                 font-size: 20px;
-                font-weight: bold;
-                margin-bottom: 10px;
-                color: #333;
+                font-weight: 700;
+                margin-bottom: 6px;
+                color: var(--chart-ink);
             }
+            .chart-legend {
+                text-align: center;
+                font-size: 11px;
+                color: var(--chart-faint);
+                margin-bottom: 8px;
+            }
+            .chart-legend .pos { color: var(--chart-pos); font-weight: 700; }
+            .chart-legend .neg { color: var(--chart-neg); font-weight: 700; }
         </style>
         <div class="chart-title">South Indian Rasi Chart</div>
+        <div class="chart-legend">House tint &amp; net = Subathuvam <span class="pos">(+)</span> vs Papathuvam <span class="neg">(&minus;)</span></div>
         <div class="rasi-chart">
     """
     
@@ -262,42 +302,62 @@ def generate_south_indian_chart(data, results):
             
             rasi_name = RASI_NAMES.get(house_rasi.get(house_num, ''), '')
             planets_in_house = house_planets.get(house_num, [])
-            
+
             # Get user's house number (starting from ascendant = 1)
             user_house_num = chart_house_to_user_house.get(house_num, house_num)
-            
+
             cell_class = 'chart-cell'
             # Highlight user's ascendant house in the chart
             if house_num == user_ascendant_house_in_chart:
                 cell_class += ' house-1 user-ascendant'
-            
-            html += f'<div class="{cell_class}">'
-            html += f'<div class="house-number">House {user_house_num}</div>'
+
+            # Point-scale tint + net badge for this house (if strengths provided)
+            strength = house_strengths.get(user_house_num)
+            cell_style = ''
+            net_badge = ''
+            if strength is not None:
+                net = strength.get('net', 0) or 0
+                # intensity 0..1 of |net|, capped so text stays readable
+                pct = min(abs(net), 200) / 200 * 55
+                if net > 0:
+                    cell_style = (f' style="background: color-mix(in srgb, '
+                                  f'var(--chart-pos) {pct:.0f}%, var(--chart-surface));"')
+                    net_badge = f'<span class="house-net pos">+{net:g}</span>'
+                elif net < 0:
+                    cell_style = (f' style="background: color-mix(in srgb, '
+                                  f'var(--chart-neg) {pct:.0f}%, var(--chart-surface));"')
+                    net_badge = f'<span class="house-net neg">{net:g}</span>'
+                else:
+                    net_badge = '<span class="house-net zero">0</span>'
+
+            html += f'<div class="{cell_class}"{cell_style}>'
+            html += ('<div class="cell-head">'
+                     f'<span class="house-number">House {user_house_num}</span>'
+                     f'{net_badge}</div>')
             html += f'<div class="rasi-name">{rasi_name}</div>'
             html += '<div class="planet-list">'
-            
+
             if not planets_in_house:
-                html += '<div class="planet-item" style="color: #999; font-style: italic;">Empty</div>'
-            
+                html += '<div class="planet-item" style="color: var(--chart-faint); font-style: italic;">Empty</div>'
+
             for planet_info in planets_in_house:
                 planet_name = planet_info['name']
                 degree = planet_info['degree']
-                symbol = PLANET_SYMBOLS.get(planet_name, '')
                 name = PLANET_NAMES.get(planet_name, planet_name.upper())
-                
+                name_class = 'chart-asc-planet' if planet_name == 'ascendant' else ''
+
                 # Format degree (degree is already within the sign, 0-30)
                 deg_int = int(degree)
                 deg_min = int((degree - deg_int) * 60)
                 degree_str = f"{deg_int}° {deg_min:02d}'"
-                
+
                 html += f'''
                 <div class="planet-item">
-                    <!-- <span class="planet-symbol">{symbol}</span> -->
-                    <span>{name}</span>
+                    <span class="{name_class}">{name}</span>
                     <span class="planet-degree">{degree_str}</span>
                 </div>
                 '''
-            
+
             html += '</div></div>'
     
     html += """
