@@ -39,6 +39,7 @@ from core.point_scoring import (
     _ordinal,
     _clamp01,
     _moon_benefic_points,
+    _is_combust,
 )
 
 # ==========================================================================
@@ -95,8 +96,11 @@ def _house_track1(house_num, chart, tithi_sheet):
                     facts.append((f"Moon {_ordinal(dist)} aspect ({tithi_sheet['tithi_name']})", c))
             continue
 
-        # ---- Redeemers (Jupiter, Venus) --------------------------------
+        # ---- Redeemers (Jupiter, Venus, Mercury) -----------------------
         if other in POINTS["redeemer_base"]:
+            # A combust Mercury is dysfunctional -> no benefic to the house.
+            if other == "mercury" and _is_combust(chart, "mercury"):
+                continue
             base = POINTS["redeemer_base"][other]
             if is_occupant:
                 facts.append((f"{other} in house (+)", base))
