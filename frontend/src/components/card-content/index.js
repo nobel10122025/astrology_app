@@ -2,7 +2,7 @@ import React from "react";
 
 import CardDetailRow from "./card";
 
-import { getValue, getScoreColor } from '../../utils/basic-logic';
+import { getValue } from '../../utils/basic-logic';
 import { PLANET_SYMBOLS } from '../../utils/constants';
 
 import "./style.css";
@@ -122,23 +122,18 @@ const CardContent = ({ results, expandItem, toggle, is_planet_card }) => {
         const isExpanded = expandItem.has(
           is_planet_card ? item.planet : item.house
         );
-        // Houses now carry the point-scale strength (mapped onto -5..15); fall
-        // back to the legacy final_score if it is missing.
-        const score = getValue(item.strength_score ?? item.final_score);
-        const normalizedScore = ((score + 5) / 20) * 100;
-        const scoreColor = getScoreColor(score);
-
-        // Check if both subathuva and pabathuvam are not 0
-        const subathuvaValue = getValue(item.subathuva);
-        const pabathuvamValue = getValue(item.pabathuvam);
-        const hasBothEffects = subathuvaValue !== 0 && pabathuvamValue !== 0;
-        const hasOnlySubathuva = subathuvaValue !== 0 && pabathuvamValue === 0;
-        const hasOnlyPabathuvam = subathuvaValue === 0 && pabathuvamValue !== 0;
+        // Dual-effect emoji from the point-scale contact split (same source as
+        // the Subathuvam/Papathuvam bar), so planets and houses read alike.
+        const subathuvamValue = getValue(item.subathuvam);   // >= 0
+        const papathuvamValue = getValue(item.papathuvam);   // <= 0
+        const hasBothEffects = subathuvamValue !== 0 && papathuvamValue !== 0;
+        const hasOnlySubathuva = subathuvamValue !== 0 && papathuvamValue === 0;
+        const hasOnlyPabathuvam = subathuvamValue === 0 && papathuvamValue !== 0;
         const emoji = hasBothEffects ? "❤️" : hasOnlySubathuva ? "💚" : hasOnlyPabathuvam ? "🖤" : "💛";
-        const emojiTitle = hasBothEffects ? "Has both Subathuva and Pabathuvam effects"
-          : hasOnlySubathuva ? "Has only Subathuva effects"
-          : hasOnlyPabathuvam ? "Has only Pabathuvam effects"
-          : "Has no Subathuva or Pabathuvam effects";
+        const emojiTitle = hasBothEffects ? "Has both Subathuvam and Papathuvam effects"
+          : hasOnlySubathuva ? "Has only Subathuvam effects"
+          : hasOnlyPabathuvam ? "Has only Papathuvam effects"
+          : "Has no Subathuvam or Papathuvam effects";
 
         return (
           <div
@@ -160,29 +155,10 @@ const CardContent = ({ results, expandItem, toggle, is_planet_card }) => {
                   {emoji}
                 </span>
               </div>
-              {/* final_score is kept internally but shown only for houses;
-                  planet cards display the two tracks below instead. */}
-              {!is_planet_card && (
-                <div
-                  className="score-badge"
-                  style={{ backgroundColor: scoreColor }}
-                >
-                  {score.toFixed(2)}
-                </div>
-              )}
+              {/* Houses render like planets: no legacy score badge/progress bar,
+                  just the quick info + the Subathuvam/Papathuvam bar below. */}
             </div>
 
-            {!is_planet_card && (
-              <div className="progress-container">
-                <div
-                  className="progress-bar"
-                  style={{
-                    width: `${normalizedScore}%`,
-                    backgroundColor: scoreColor,
-                  }}
-                />
-              </div>
-            )}
             {!is_planet_card && (
               <div className="planet-quick-info">
                 <div className="info-item">

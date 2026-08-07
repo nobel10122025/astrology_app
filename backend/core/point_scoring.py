@@ -97,17 +97,20 @@ POINTS = {
     },
 
     # --- Track 1: contact base points ------------------------------------
-    # Redeemers (benefic contacts add). Mercury is intentionally NOT a redeemer
-    # here - it was not in your 100/80/60/25 list. Add "mercury": N to include.
+    # Redeemers (benefic contacts add). Mercury is a mild benefic (below Venus).
+    # BUT Mercury is dysfunctional near the Sun: a combust Mercury gives no
+    # benefic to anyone, and Mercury never boosts the Sun itself (see the
+    # redeemer branch below). Its 7th aspect works via the default aspect table.
     "redeemer_base": {
         "jupiter": 80,
         "venus":   60,
+        "mercury": 30,
         # moon is handled by tithi (25 at the band edge -> 100 at purnima)
     },
-    # Afflicters (malefic contacts subtract). No per-planet segregation: one
-    # base of 60, then shaped by the aspect-power table below.
+    # Afflicters (malefic contacts subtract). Base shaped by the aspect-power
+    # table below. Ketu afflicts less than Rahu.
     "afflicter_base": {
-        "saturn": 60, "mars": 60, "rahu": 60, "ketu": 60,
+        "saturn": 60, "mars": 60, "rahu": 60, "ketu": 30,
     },
 
     # Malefic pairs that do NOT afflict each other WHEN CONJUNCT -> their
@@ -400,6 +403,18 @@ def _moon_benefic_points(tithi_sheet):
     return round(25.0 + (bw - 0.5) / 1.5 * 75.0, 1)
 
 
+def _is_combust(chart, planet):
+    """True if `planet` is within its combustion orb of the Sun."""
+    orb = POINTS["combust_orb"].get(planet)
+    sun = chart.get("sun")
+    if orb is None or not sun:
+        return False
+    dist = calculate_degree_difference(
+        float((chart[planet] or {}).get("degree", 0)), float(sun.get("degree", 0))
+    )
+    return dist <= orb
+
+
 def _combustion(chart, planet):
     """Combustion penalty for `planet` (0 if not combustible / not combust)."""
     orb = POINTS["combust_orb"].get(planet)
@@ -480,8 +495,12 @@ def _track1_contacts(chart, planet):
                     total += c
             continue
 
-        # ---- Redeemers (Jupiter, Venus) ---------------------------------
+        # ---- Redeemers (Jupiter, Venus, Mercury) ------------------------
         if other in POINTS["redeemer_base"]:
+            # Mercury is dysfunctional near the Sun: a combust Mercury gives no
+            # benefic to anyone, and Mercury never boosts the Sun itself.
+            if other == "mercury" and (planet == "sun" or _is_combust(chart, "mercury")):
+                continue
             base = POINTS["redeemer_base"][other]
             if is_conj:
                 c = round(base * tightness, 1)
